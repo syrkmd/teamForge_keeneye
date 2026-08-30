@@ -25,6 +25,8 @@ import org.yvl.teamforge.security.jwt.JwtService;
 import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.service.RefreshTokenService;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -52,6 +54,12 @@ public class AuthService {
                         .about("")
                         .githubUsername("")
                         .isActive(true)
+                        .createdAt(Instant.now())
+                        .updatedAt(Instant.now())
+                        .averageRating(0.0)
+                        .reviewsCount(0)
+                        .completedProjectsCount(0)
+                        .completionRate(0.0)
                         .systemRole(
                                 systemRoleRepository.findByName(SystemRoleName.USER).orElseThrow(() -> new SystemRoleNotFoundException(SystemRoleName.USER))
                         )
