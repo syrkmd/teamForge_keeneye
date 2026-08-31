@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.admin.dto.response.UserAdminView;
-import org.yvl.teamforge.admin.mapper.UserMapper;
+import org.yvl.teamforge.admin.mapper.UserAdminMapper;
 import org.yvl.teamforge.entity.SystemRole;
 import org.yvl.teamforge.entity.User;
 import org.yvl.teamforge.entity.enums.SystemRoleName;
@@ -23,7 +23,7 @@ public class AdminUserService {
 
     private final UserRepository userRepository;
     private final SystemRoleRepository systemRoleRepository;
-    private final UserMapper userMapper;
+    private final UserAdminMapper userMapper;
 
     public Page<UserAdminView> getUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);

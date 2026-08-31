@@ -6,7 +6,7 @@ import org.yvl.teamforge.admin.dto.response.UserAdminView;
 import org.yvl.teamforge.entity.User;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface UserAdminMapper {
 
     @Mapping(source = "systemRole.name", target = "role")
     UserAdminView toAdminView(User user);
