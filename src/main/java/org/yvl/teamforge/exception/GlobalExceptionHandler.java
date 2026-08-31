@@ -36,6 +36,12 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.INTERNAL_SERVER_ERROR);
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(SkillCategoryNotFoundException.class)
+    public ApiError handleSkillCategoryNotFoundException(SkillCategoryNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.INTERNAL_SERVER_ERROR);
+    }
+
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidCredentialsException.class)
     public ApiError handleInvalidCredentialsException(InvalidCredentialsException exception) {
@@ -54,10 +60,34 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserSkillNotFoundException.class)
+    public ApiError handleUserSkillNotFound(UserSkillNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SkillNotFoundException.class)
+    public ApiError handleSkillNotFound(SkillNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AdminTargetModificationNotAllowedException.class)
     public ApiError handleAdminTargetModificationNotAllowedException(AdminTargetModificationNotAllowedException exception) {
         return new ApiError(exception.getMessage(), StatusCode.ADMIN_MODIFICATION_NOT_ALLOWED);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(UserSkillAlreadyExistsException.class)
+    public ApiError handleUserSkillAlreadyExistsException(UserSkillAlreadyExistsException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.USER_SKILL_ALREADY_EXISTS);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(SkillAlreadyExistsException.class)
+    public ApiError handleSkillAlreadyExists(SkillAlreadyExistsException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.SKILL_ALREADY_EXISTS);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
