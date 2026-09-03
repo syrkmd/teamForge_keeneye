@@ -1,10 +1,7 @@
 package org.yvl.teamforge.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
 
 @Entity
@@ -13,6 +10,7 @@ import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProjectRole {
 
     @Id

@@ -54,6 +54,12 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.USER_BLOCKED);
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ProjectAccessDeniedException.class)
+    public ApiError handleProjectAccessDeniedException(ProjectAccessDeniedException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.FORBIDDEN);
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
     public ApiError handleUserNotFound(UserNotFoundException exception) {
@@ -72,6 +78,36 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectTemplateNotFoundException.class)
+    public ApiError handleProjectTemplateNotFound(ProjectTemplateNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ApiError handleProjectNotFound(ProjectNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectRoleNotFoundException.class)
+    public ApiError handleProjectRoleNotFound(ProjectRoleNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectRoleNotBelongToProjectException.class)
+    public ApiError handleProjectRoleNotBelongToProject(ProjectRoleNotBelongToProjectException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_NOT_BELONG_TO_PROJECT);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectRoleSkillNotFoundException.class)
+    public ApiError handleProjectRoleSkillNotFound(ProjectRoleSkillNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_SKILL_NOT_FOUND);
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AdminTargetModificationNotAllowedException.class)
     public ApiError handleAdminTargetModificationNotAllowedException(AdminTargetModificationNotAllowedException exception) {
@@ -88,6 +124,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SkillAlreadyExistsException.class)
     public ApiError handleSkillAlreadyExists(SkillAlreadyExistsException exception) {
         return new ApiError(exception.getMessage(), StatusCode.SKILL_ALREADY_EXISTS);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(InvalidProjectStatusTransitionException.class)
+    public ApiError handleInvalidProjectStatusTransitionException(InvalidProjectStatusTransitionException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.INVALID_PROJECT_STATUS_TRANSITION);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProjectArchivedException.class)
+    public ApiError handleProjectArchivedException(ProjectArchivedException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ARCHIVED);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProjectRoleSkillAlreadyExistsException.class)
+    public ApiError handleProjectRoleSkillAlreadyExistsException(ProjectRoleSkillAlreadyExistsException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_SKILL_ALREADY_EXISTS);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
