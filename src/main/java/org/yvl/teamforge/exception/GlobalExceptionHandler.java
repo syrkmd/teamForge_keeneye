@@ -144,6 +144,19 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_SKILL_ALREADY_EXISTS);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProjectRoleNotOpenException.class)
+    public ApiError handleProjectRoleNotOpenException(ProjectRoleNotOpenException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_NOT_OPEN);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProjectRoleHasNoSkillRequirementsException.class)
+    public ApiError handleProjectRoleHasNoSkillRequirements(ProjectRoleHasNoSkillRequirementsException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_HAS_NO_SKILLS_REQUIREMENTS);
+    }
+
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ApiError handleValidation(MethodArgumentNotValidException exception) {

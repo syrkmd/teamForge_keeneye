@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.yvl.teamforge.entity.Project;
 import org.yvl.teamforge.entity.ProjectRole;
 import org.yvl.teamforge.entity.ProjectRoleSkill;
+import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
 import org.yvl.teamforge.entity.enums.ProjectStatus;
 import org.yvl.teamforge.exception.*;
 import org.yvl.teamforge.repository.ProjectRepository;
@@ -69,5 +70,26 @@ public class ProjectAccessService {
 
         return projectRoleSkillRepository.findByProjectRoleIdAndSkillId(projectRoleId, skillId).orElseThrow(() ->
                 new ProjectRoleSkillNotFoundException(projectRoleId, skillId));
+    }
+
+    public ProjectRole getProjectRoleForMatching(
+            UserPrincipal userPrincipal,
+            Long projectId,
+            Long projectRoleId
+    ) {
+        Project project = getProjectForModification(userPrincipal, projectId);
+
+        ProjectRole projectRole = projectRoleRepository.findById(projectRoleId).orElseThrow(() ->
+                new ProjectRoleNotFoundException(projectRoleId));
+
+        if (!projectRole.getProject().getId().equals(project.getId())) {
+            throw new ProjectRoleNotBelongToProjectException(projectRoleId, projectId);
+        }
+
+        if (!projectRole.getStatus().equals(ProjectRoleStatus.OPEN)) {
+            throw new ProjectRoleNotOpenException(projectRoleId);
+        }
+
+        return projectRole;
     }
 }
