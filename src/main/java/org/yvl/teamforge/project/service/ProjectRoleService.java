@@ -15,9 +15,7 @@ import org.yvl.teamforge.project.dto.request.ProjectRoleCreateRequest;
 import org.yvl.teamforge.project.dto.request.ProjectRoleUpdateRequest;
 import org.yvl.teamforge.project.dto.response.ProjectRoleView;
 import org.yvl.teamforge.project.mapper.ProjectMapper;
-import org.yvl.teamforge.repository.ProjectRepository;
-import org.yvl.teamforge.repository.ProjectRoleRepository;
-import org.yvl.teamforge.repository.ProjectRoleSkillRepository;
+import org.yvl.teamforge.repository.*;
 import org.yvl.teamforge.security.user.UserPrincipal;
 
 @Service
@@ -27,8 +25,11 @@ public class ProjectRoleService {
 
     private final ProjectRoleRepository repository;
     private final ProjectRepository projectRepository;
+    private final InvitationRepository invitationRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final ProjectRoleSkillRepository projectRoleSkillRepository;
     private final ProjectAccessService projectAccessService;
+    private final ProjectRoleStatusService projectRoleStatusService;
     private final ProjectMapper mapper;
 
     public Page<ProjectRoleView> getProjectRoles(Long projectId, Pageable pageable) {
@@ -76,6 +77,7 @@ public class ProjectRoleService {
 
         if (request.getRequiredCount() != null) {
             projectRole.setRequiredCount(request.getRequiredCount());
+            projectRoleStatusService.updateStatus(projectRole);
         }
 
         return mapper.toProjectRoleView(projectRole);
@@ -92,6 +94,9 @@ public class ProjectRoleService {
         }
 
         projectRoleSkillRepository.deleteAllByProjectRoleId(roleId);
+
+        invitationRepository.deleteAllByProjectRoleId(roleId);
+        teamMemberRepository.deleteAllByProjectRoleId(roleId);
 
         repository.delete(projectRole);
     }

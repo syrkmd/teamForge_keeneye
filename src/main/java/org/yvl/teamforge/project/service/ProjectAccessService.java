@@ -79,6 +79,29 @@ public class ProjectAccessService {
     ) {
         Project project = getProjectForModification(userPrincipal, projectId);
 
+        return getOpenProjectRole(project, projectId, projectRoleId);
+    }
+
+    public ProjectRole getProjectRoleForInvitation(
+            Long projectId,
+            Long projectRoleId
+    ) {
+        Project project = projectRepository.findById(projectId).orElseThrow(() ->
+                new ProjectNotFoundException(projectId));
+
+        if (project.getStatus() == ProjectStatus.ARCHIVED) {
+            throw new ProjectArchivedException();
+        }
+
+        return getOpenProjectRole(project, projectId, projectRoleId);
+    }
+
+
+    private ProjectRole getOpenProjectRole(
+            Project project,
+            Long projectId,
+            Long projectRoleId
+    ) {
         ProjectRole projectRole = projectRoleRepository.findById(projectRoleId).orElseThrow(() ->
                 new ProjectRoleNotFoundException(projectRoleId));
 

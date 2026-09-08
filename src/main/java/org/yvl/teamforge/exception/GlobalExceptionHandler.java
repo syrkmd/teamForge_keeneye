@@ -57,7 +57,19 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ProjectAccessDeniedException.class)
     public ApiError handleProjectAccessDeniedException(ProjectAccessDeniedException exception) {
-        return new ApiError(exception.getMessage(), StatusCode.FORBIDDEN);
+        return new ApiError(exception.getMessage(), StatusCode.PROJECT_ACCESS_DENIED);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(InvitationAccessDeniedException.class)
+    public ApiError handleInvitationAccessDeniedException(InvitationAccessDeniedException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.INVITATION_ACCESS_DENIED);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(TeamMemberAccessDeniedException.class)
+    public ApiError handleTeamMemberAccessDeniedException(TeamMemberAccessDeniedException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.TEAM_MEMBER_ACCESS_DENIED);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -108,6 +120,24 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_SKILL_NOT_FOUND);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(TeamNotFoundException.class)
+    public ApiError handleTeamNotFound(TeamNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.TEAM_NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(InvitationNotFoundException.class)
+    public ApiError handleInvitationNotFound(InvitationNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.INVITATION_NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(TeamMemberNotFoundException.class)
+    public ApiError handleTeamMemberNotFound(TeamMemberNotFoundException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.TEAM_MEMBER_NOT_FOUND);
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AdminTargetModificationNotAllowedException.class)
     public ApiError handleAdminTargetModificationNotAllowedException(AdminTargetModificationNotAllowedException exception) {
@@ -156,6 +186,29 @@ public class GlobalExceptionHandler {
         return new ApiError(exception.getMessage(), StatusCode.PROJECT_ROLE_HAS_NO_SKILLS_REQUIREMENTS);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(InvitationAlreadyExistsException.class)
+    public ApiError handleInvitationAlreadyExistsException(InvitationAlreadyExistsException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.PENDING_INVITATION_ALREADY_EXISTS);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(UserAlreadyTeamMemberException.class)
+    public ApiError handleUserAlreadyTeamMemberException(UserAlreadyTeamMemberException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.USER_ALREADY_TEAM_MEMBER);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(InvitationAlreadyRespondedException.class)
+    public ApiError handleInvitationAlreadyRespondedException(InvitationAlreadyRespondedException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.INVITATION_ALREADY_RESPONDED);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(TeamMemberAlreadyInactiveException.class)
+    public ApiError handleTeamMemberAlreadyInactiveException(TeamMemberAlreadyInactiveException exception) {
+        return new ApiError(exception.getMessage(), StatusCode.TEAM_MEMBER_ALREADY_INACTIVE);
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

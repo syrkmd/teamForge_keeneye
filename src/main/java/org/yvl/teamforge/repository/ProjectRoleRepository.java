@@ -13,5 +13,7 @@ public interface ProjectRoleRepository extends JpaRepository<ProjectRole, Long> 
 
     Page<ProjectRole> findByProjectId(Long projectId, Pageable pageable);
 
-    List<ProjectRole> findByProjectIdAndStatus(Long project_id, ProjectRoleStatus status);
+    List<ProjectRole> findByProjectIdAndStatus(Long projectId, ProjectRoleStatus status);
+
+    boolean existsByProjectIdAndStatus(Long projectId, ProjectRoleStatus status);
 }
