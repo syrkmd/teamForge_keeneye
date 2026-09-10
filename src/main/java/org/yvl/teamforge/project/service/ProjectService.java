@@ -66,23 +66,22 @@ public class ProjectService {
 
         List<TemplateRole> templateRoles = templateRoleRepository.findByProjectTemplateId(template.getId());
 
-        Map<Long, ProjectRole> roleMap = new HashMap<>();
-
         List<ProjectRole> projectRoles = templateRoles
                 .stream()
-                .map(templateRole -> {
-                    ProjectRole projectRole = ProjectRole.builder()
+                .map(templateRole -> ProjectRole.builder()
                             .project(project)
                             .description(templateRole.getDescription())
                             .roleName(templateRole.getRoleName())
                             .requiredCount(templateRole.getRequiredCount())
                             .status(ProjectRoleStatus.OPEN)
-                            .build();
+                            .build()
+                ).toList();
 
-                    roleMap.put(templateRole.getId(), projectRole);
+        Map<Long, ProjectRole> roleMap = new HashMap<>();
 
-                    return projectRole;
-                }).toList();
+        for (int i = 0; i < templateRoles.size(); i++) {
+            roleMap.put(templateRoles.get(i).getId(), projectRoles.get(i));
+        }
 
         projectRoleRepository.saveAll(projectRoles);
 
