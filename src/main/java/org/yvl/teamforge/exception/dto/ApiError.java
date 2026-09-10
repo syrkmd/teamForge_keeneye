@@ -9,13 +9,10 @@ public class ApiError {
 
     private final String message;
 
-    private final StatusCode code;
-
     private final LocalDateTime timestamp;
 
-    public ApiError(String message, StatusCode code) {
+    public ApiError(String message) {
         this.message = message;
-        this.code = code;
         this.timestamp = LocalDateTime.now();
     }
 }

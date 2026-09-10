@@ -10,10 +10,6 @@ public class UserSkillRequestValidator implements ConstraintValidator<ValidUserS
     @Override
     public boolean isValid(UserSkillRequest request, ConstraintValidatorContext context) {
 
-        if (request == null) {
-            return true;
-        }
-
         if (request.getSkillId() != null) {
             return true;
         }

@@ -9,7 +9,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.yvl.teamforge.exception.dto.ApiError;
-import org.yvl.teamforge.exception.dto.StatusCode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        ApiError error = new ApiError(authException.getMessage(), StatusCode.UNAUTHORIZED);
+        ApiError error = new ApiError(authException.getMessage());
 
         objectMapper.writeValue(response.getOutputStream(), error);
     }
