@@ -11,12 +11,6 @@ import org.yvl.teamforge.exception.dto.ApiError;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ApiError handleUsernameAlreadyExists(EmailAlreadyExistsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ApiError handleInvalidRefreshToken(InvalidRefreshTokenException exception) {
@@ -212,6 +206,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(TeamMemberAlreadyInactiveException.class)
     public ApiError handleTeamMemberAlreadyInactiveException(TeamMemberAlreadyInactiveException exception) {
+        return new ApiError(exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ApiError handleUsernameAlreadyExists(EmailAlreadyExistsException exception) {
         return new ApiError(exception.getMessage());
     }
 

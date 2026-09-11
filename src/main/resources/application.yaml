@@ -19,3 +19,6 @@ jwt:
 
 analytics:
   refresh-delay: 300000
+
+recommendation:
+  fallback-delay: 900000

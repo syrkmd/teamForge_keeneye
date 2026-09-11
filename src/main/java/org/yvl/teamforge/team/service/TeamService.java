@@ -1,6 +1,7 @@
 package org.yvl.teamforge.team.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.yvl.teamforge.entity.enums.TeamStatus;
 import org.yvl.teamforge.exception.*;
 import org.yvl.teamforge.project.service.ProjectAccessService;
 import org.yvl.teamforge.project.service.ProjectRoleStatusService;
+import org.yvl.teamforge.recommendation.event.TeamCompositionChangedEvent;
 import org.yvl.teamforge.repository.TeamMemberRepository;
 import org.yvl.teamforge.repository.TeamRepository;
 import org.yvl.teamforge.security.user.UserPrincipal;
@@ -26,6 +28,7 @@ import java.time.Instant;
 @Transactional
 public class TeamService {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final ProjectAccessService projectAccessService;
@@ -84,6 +87,8 @@ public class TeamService {
 
         projectRoleStatusService.updateStatus(projectRole);
 
+        eventPublisher.publishEvent(new TeamCompositionChangedEvent(team.getId()));
+
         return teamMember;
     }
 
@@ -118,13 +123,7 @@ public class TeamService {
             throw new TeamMemberAlreadyInactiveException();
         }
 
-        teamMember.setStatus(TeamMemberStatus.INACTIVE);
-        teamMember.setLeftAt(Instant.now());
-        teamMember.setReason(request.getReason());
-
-        ProjectRole projectRole = teamMember.getProjectRole();
-
-        projectRoleStatusService.updateStatus(projectRole);
+        deactivateMember(teamMember, request.getReason());
 
         return mapper.toTeamMemberView(teamMember);
     }
@@ -148,14 +147,23 @@ public class TeamService {
             throw new TeamMemberAccessDeniedException();
         }
 
-        teamMember.setStatus(TeamMemberStatus.INACTIVE);
-        teamMember.setLeftAt(Instant.now());
-        teamMember.setReason(request.getReason());
-
-        ProjectRole projectRole = teamMember.getProjectRole();
-
-        projectRoleStatusService.updateStatus(projectRole);
+        deactivateMember(teamMember, request.getReason());
 
         return mapper.toTeamMemberView(teamMember);
+    }
+
+    private void deactivateMember(
+            TeamMember teamMember,
+            String reason
+    ) {
+        teamMember.setStatus(TeamMemberStatus.INACTIVE);
+        teamMember.setLeftAt(Instant.now());
+        teamMember.setReason(reason);
+
+        projectRoleStatusService.updateStatus(teamMember.getProjectRole());
+
+        eventPublisher.publishEvent(
+                new TeamCompositionChangedEvent(teamMember.getTeam().getId())
+        );
     }
 }

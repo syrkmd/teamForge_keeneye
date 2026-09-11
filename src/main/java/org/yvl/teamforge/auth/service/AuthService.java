@@ -23,7 +23,7 @@ import org.yvl.teamforge.repository.SystemRoleRepository;
 import org.yvl.teamforge.repository.UserRepository;
 import org.yvl.teamforge.security.jwt.JwtService;
 import org.yvl.teamforge.security.user.UserPrincipal;
-import org.yvl.teamforge.service.RefreshTokenService;
+import org.yvl.teamforge.refreshToken.service.RefreshTokenService;
 
 import java.time.Instant;
 

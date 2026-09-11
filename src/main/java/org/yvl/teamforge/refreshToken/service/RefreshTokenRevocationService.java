@@ -1,4 +1,4 @@
-package org.yvl.teamforge.service;
+package org.yvl.teamforge.refreshToken.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
