@@ -7,7 +7,7 @@ import org.yvl.teamforge.entity.ProjectRole;
 import org.yvl.teamforge.entity.ProjectRoleSkill;
 import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
 import org.yvl.teamforge.entity.enums.ProjectStatus;
-import org.yvl.teamforge.exception.*;
+import org.yvl.teamforge.project.exception.*;
 import org.yvl.teamforge.repository.ProjectRepository;
 import org.yvl.teamforge.repository.ProjectRoleRepository;
 import org.yvl.teamforge.repository.ProjectRoleSkillRepository;
@@ -22,18 +22,11 @@ public class ProjectAccessService {
     private final ProjectRoleSkillRepository projectRoleSkillRepository;
 
     public Project getProjectForModification(UserPrincipal userPrincipal, Long projectId) {
-        Project project = projectRepository.findById(projectId).orElseThrow(() ->
-                new ProjectNotFoundException(projectId));
-
-        if (!project.getOwner().getId().equals(userPrincipal.getUser().getId())) {
-            throw new ProjectAccessDeniedException();
-        }
-
-        if (project.getStatus() == ProjectStatus.ARCHIVED) {
-            throw new ProjectArchivedException();
-        }
-
-        return project;
+        return projectRepository.findByIdAndOwnerIdAndStatusNot(
+                projectId,
+                userPrincipal.getUser().getId(),
+                ProjectStatus.ARCHIVED
+        ).orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 
     public ProjectRole getProjectRoleForModification(

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.RefreshToken;
 import org.yvl.teamforge.entity.User;
-import org.yvl.teamforge.exception.InvalidRefreshTokenException;
+import org.yvl.teamforge.refreshToken.exception.InvalidRefreshTokenException;
 import org.yvl.teamforge.repository.RefreshTokenRepository;
 import org.yvl.teamforge.security.hash.HashService;
 import org.yvl.teamforge.security.jwt.JwtService;

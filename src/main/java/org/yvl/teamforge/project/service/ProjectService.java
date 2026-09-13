@@ -8,7 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.*;
 import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
 import org.yvl.teamforge.entity.enums.ProjectStatus;
-import org.yvl.teamforge.exception.*;
+import org.yvl.teamforge.project.exception.InvalidProjectStatusTransitionException;
+import org.yvl.teamforge.project.exception.ProjectAccessDeniedException;
+import org.yvl.teamforge.project.exception.ProjectNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectTemplateNotFoundException;
 import org.yvl.teamforge.project.dto.request.ProjectCreateRequest;
 import org.yvl.teamforge.project.dto.request.ProjectUpdateRequest;
 import org.yvl.teamforge.project.dto.response.ProjectView;
@@ -47,7 +50,6 @@ public class ProjectService {
     }
 
     public ProjectView createProject(UserPrincipal userPrincipal, ProjectCreateRequest request) {
-
         var template = templateRepository.findByIdAndIsActiveTrue(request.getTemplateId()).orElseThrow(() ->
                 new ProjectTemplateNotFoundException(request.getTemplateId()));
 

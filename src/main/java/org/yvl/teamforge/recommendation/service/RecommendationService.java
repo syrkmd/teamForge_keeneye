@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.Recommendation;
 import org.yvl.teamforge.entity.Team;
-import org.yvl.teamforge.exception.TeamNotFoundException;
+import org.yvl.teamforge.team.exception.TeamNotFoundException;
 import org.yvl.teamforge.project.service.ProjectAccessService;
 import org.yvl.teamforge.recommendation.dto.response.RecommendationView;
 import org.yvl.teamforge.recommendation.mapper.RecommendationMapper;

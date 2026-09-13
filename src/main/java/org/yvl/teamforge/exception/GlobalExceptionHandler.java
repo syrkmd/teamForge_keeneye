@@ -6,14 +6,50 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.yvl.teamforge.admin.exception.AdminTargetModificationNotAllowedException;
+import org.yvl.teamforge.auth.exception.EmailAlreadyExistsException;
+import org.yvl.teamforge.auth.exception.InvalidAuthenticatedPrincipal;
+import org.yvl.teamforge.auth.exception.InvalidCredentialsException;
+import org.yvl.teamforge.auth.exception.UserBlockedException;
+import org.yvl.teamforge.analytics.exception.TeamAnalyticsNotFoundException;
 import org.yvl.teamforge.exception.dto.ApiError;
+import org.yvl.teamforge.invitation.exception.InvitationAccessDeniedException;
+import org.yvl.teamforge.invitation.exception.InvitationAlreadyExistsException;
+import org.yvl.teamforge.invitation.exception.InvitationAlreadyRespondedException;
+import org.yvl.teamforge.invitation.exception.InvitationNotFoundException;
+import org.yvl.teamforge.matching.exception.ProjectRoleHasNoSkillRequirementsException;
+import org.yvl.teamforge.project.exception.InvalidProjectStatusTransitionException;
+import org.yvl.teamforge.project.exception.ProjectAccessDeniedException;
+import org.yvl.teamforge.project.exception.ProjectArchivedException;
+import org.yvl.teamforge.project.exception.ProjectNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectRoleNotBelongToProjectException;
+import org.yvl.teamforge.project.exception.ProjectRoleNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectRoleHasTeamMembersException;
+import org.yvl.teamforge.project.exception.ProjectRoleNotOpenException;
+import org.yvl.teamforge.project.exception.ProjectRoleSkillAlreadyExistsException;
+import org.yvl.teamforge.project.exception.ProjectRoleSkillNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectTemplateNotFoundException;
+import org.yvl.teamforge.refreshToken.exception.InvalidRefreshTokenException;
+import org.yvl.teamforge.skill.exception.SkillAlreadyExistsException;
+import org.yvl.teamforge.skill.exception.SkillCategoryNotFoundException;
+import org.yvl.teamforge.skill.exception.SkillNotFoundException;
+import org.yvl.teamforge.skill.exception.UserSkillAlreadyExistsException;
+import org.yvl.teamforge.skill.exception.UserSkillNotFoundException;
+import org.yvl.teamforge.team.exception.TeamMemberAccessDeniedException;
+import org.yvl.teamforge.team.exception.TeamMemberAlreadyInactiveException;
+import org.yvl.teamforge.team.exception.TeamMemberNotFoundException;
+import org.yvl.teamforge.team.exception.TeamNotFoundException;
+import org.yvl.teamforge.team.exception.UserAlreadyTeamMemberException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ApiError handleInvalidRefreshToken(InvalidRefreshTokenException exception) {
+    @ExceptionHandler({
+            InvalidRefreshTokenException.class,
+            InvalidCredentialsException.class
+    })
+    public ApiError handleUnauthorized(RuntimeException exception) {
         return new ApiError(exception.getMessage());
     }
 
@@ -24,194 +60,62 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(SystemRoleNotFoundException.class)
-    public ApiError handleSystemRoleNotFoundException(SystemRoleNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(SkillCategoryNotFoundException.class)
-    public ApiError handleSkillCategoryNotFoundException(SkillCategoryNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ApiError handleInvalidCredentialsException(InvalidCredentialsException exception) {
+    @ExceptionHandler({
+            SystemRoleNotFoundException.class,
+            SkillCategoryNotFoundException.class
+    })
+    public ApiError handleInternalServerError(RuntimeException exception) {
         return new ApiError(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(UserBlockedException.class)
-    public ApiError handleUserBlockedException(UserBlockedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(ProjectAccessDeniedException.class)
-    public ApiError handleProjectAccessDeniedException(ProjectAccessDeniedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(InvitationAccessDeniedException.class)
-    public ApiError handleInvitationAccessDeniedException(InvitationAccessDeniedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(TeamMemberAccessDeniedException.class)
-    public ApiError handleTeamMemberAccessDeniedException(TeamMemberAccessDeniedException exception) {
+    @ExceptionHandler({
+            UserBlockedException.class,
+            ProjectAccessDeniedException.class,
+            InvitationAccessDeniedException.class,
+            TeamMemberAccessDeniedException.class
+    })
+    public ApiError handleForbidden(RuntimeException exception) {
         return new ApiError(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UserNotFoundException.class)
-    public ApiError handleUserNotFound(UserNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UserSkillNotFoundException.class)
-    public ApiError handleUserSkillNotFound(UserSkillNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(SkillNotFoundException.class)
-    public ApiError handleSkillNotFound(SkillNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ProjectTemplateNotFoundException.class)
-    public ApiError handleProjectTemplateNotFound(ProjectTemplateNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ProjectNotFoundException.class)
-    public ApiError handleProjectNotFound(ProjectNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ProjectRoleNotFoundException.class)
-    public ApiError handleProjectRoleNotFound(ProjectRoleNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ProjectRoleNotBelongToProjectException.class)
-    public ApiError handleProjectRoleNotBelongToProject(ProjectRoleNotBelongToProjectException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ProjectRoleSkillNotFoundException.class)
-    public ApiError handleProjectRoleSkillNotFound(ProjectRoleSkillNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(TeamNotFoundException.class)
-    public ApiError handleTeamNotFound(TeamNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(InvitationNotFoundException.class)
-    public ApiError handleInvitationNotFound(InvitationNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(TeamMemberNotFoundException.class)
-    public ApiError handleTeamMemberNotFound(TeamMemberNotFoundException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(TeamAnalyticsNotFoundException.class)
-    public ApiError handleTeamAnalyticsNotFound(TeamAnalyticsNotFoundException exception) {
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            UserSkillNotFoundException.class,
+            SkillNotFoundException.class,
+            ProjectTemplateNotFoundException.class,
+            ProjectNotFoundException.class,
+            ProjectRoleNotFoundException.class,
+            ProjectRoleNotBelongToProjectException.class,
+            ProjectRoleSkillNotFoundException.class,
+            TeamNotFoundException.class,
+            InvitationNotFoundException.class,
+            TeamMemberNotFoundException.class,
+            TeamAnalyticsNotFoundException.class
+    })
+    public ApiError handleNotFound(RuntimeException exception) {
         return new ApiError(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(AdminTargetModificationNotAllowedException.class)
-    public ApiError handleAdminTargetModificationNotAllowedException(AdminTargetModificationNotAllowedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(UserSkillAlreadyExistsException.class)
-    public ApiError handleUserSkillAlreadyExistsException(UserSkillAlreadyExistsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(SkillAlreadyExistsException.class)
-    public ApiError handleSkillAlreadyExists(SkillAlreadyExistsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(InvalidProjectStatusTransitionException.class)
-    public ApiError handleInvalidProjectStatusTransitionException(InvalidProjectStatusTransitionException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ProjectArchivedException.class)
-    public ApiError handleProjectArchivedException(ProjectArchivedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ProjectRoleSkillAlreadyExistsException.class)
-    public ApiError handleProjectRoleSkillAlreadyExistsException(ProjectRoleSkillAlreadyExistsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ProjectRoleNotOpenException.class)
-    public ApiError handleProjectRoleNotOpenException(ProjectRoleNotOpenException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ProjectRoleHasNoSkillRequirementsException.class)
-    public ApiError handleProjectRoleHasNoSkillRequirements(ProjectRoleHasNoSkillRequirementsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(InvitationAlreadyExistsException.class)
-    public ApiError handleInvitationAlreadyExistsException(InvitationAlreadyExistsException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(UserAlreadyTeamMemberException.class)
-    public ApiError handleUserAlreadyTeamMemberException(UserAlreadyTeamMemberException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(InvitationAlreadyRespondedException.class)
-    public ApiError handleInvitationAlreadyRespondedException(InvitationAlreadyRespondedException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(TeamMemberAlreadyInactiveException.class)
-    public ApiError handleTeamMemberAlreadyInactiveException(TeamMemberAlreadyInactiveException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ApiError handleUsernameAlreadyExists(EmailAlreadyExistsException exception) {
+    @ExceptionHandler({
+            AdminTargetModificationNotAllowedException.class,
+            UserSkillAlreadyExistsException.class,
+            SkillAlreadyExistsException.class,
+            InvalidProjectStatusTransitionException.class,
+            ProjectArchivedException.class,
+            ProjectRoleSkillAlreadyExistsException.class,
+            ProjectRoleNotOpenException.class,
+            ProjectRoleHasTeamMembersException.class,
+            ProjectRoleHasNoSkillRequirementsException.class,
+            InvitationAlreadyExistsException.class,
+            UserAlreadyTeamMemberException.class,
+            InvitationAlreadyRespondedException.class,
+            TeamMemberAlreadyInactiveException.class,
+            EmailAlreadyExistsException.class
+    })
+    public ApiError handleConflict(RuntimeException exception) {
         return new ApiError(exception.getMessage());
     }
 

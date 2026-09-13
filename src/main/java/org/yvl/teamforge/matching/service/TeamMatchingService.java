@@ -8,7 +8,7 @@ import org.yvl.teamforge.entity.ProjectRoleSkill;
 import org.yvl.teamforge.entity.User;
 import org.yvl.teamforge.entity.UserSkill;
 import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
-import org.yvl.teamforge.exception.ProjectRoleHasNoSkillRequirementsException;
+import org.yvl.teamforge.matching.exception.ProjectRoleHasNoSkillRequirementsException;
 import org.yvl.teamforge.matching.dto.response.CandidateView;
 import org.yvl.teamforge.matching.dto.response.MatchedSkillView;
 import org.yvl.teamforge.matching.dto.response.ProjectRoleCandidatesView;

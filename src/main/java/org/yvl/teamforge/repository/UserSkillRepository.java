@@ -18,8 +18,6 @@ public interface UserSkillRepository extends JpaRepository<UserSkill, Long> {
 
     Page<UserSkill> findByUserId(Long userId, Pageable pageable);
 
-    void deleteAllBySkillId(Long skillId);
-
     List<UserSkill> findBySkillIdIn(List<Long> skillIds);
 
     @Query("""

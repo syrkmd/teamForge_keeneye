@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.analytics.dto.projection.SkillGapRow;
 import org.yvl.teamforge.analytics.dto.response.SkillGapView;
 import org.yvl.teamforge.analytics.mapper.SkillGapMapper;
-import org.yvl.teamforge.exception.TeamNotFoundException;
+import org.yvl.teamforge.team.exception.TeamNotFoundException;
 import org.yvl.teamforge.project.service.ProjectAccessService;
 import org.yvl.teamforge.repository.ProjectRoleSkillRepository;
 import org.yvl.teamforge.repository.TeamRepository;

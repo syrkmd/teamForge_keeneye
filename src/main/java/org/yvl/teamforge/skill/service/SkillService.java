@@ -8,16 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.Skill;
 import org.yvl.teamforge.entity.SkillCategory;
 import org.yvl.teamforge.entity.enums.TypeSkill;
-import org.yvl.teamforge.exception.SkillAlreadyExistsException;
-import org.yvl.teamforge.exception.SkillCategoryNotFoundException;
-import org.yvl.teamforge.exception.SkillNotFoundException;
 import org.yvl.teamforge.repository.SkillCategoryRepository;
 import org.yvl.teamforge.repository.SkillRepository;
-import org.yvl.teamforge.repository.UserSkillRepository;
-import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.skill.dto.request.SkillCreateRequest;
 import org.yvl.teamforge.skill.dto.response.SkillCategoryView;
 import org.yvl.teamforge.skill.dto.response.SkillView;
+import org.yvl.teamforge.skill.exception.SkillAlreadyExistsException;
+import org.yvl.teamforge.skill.exception.SkillCategoryNotFoundException;
+import org.yvl.teamforge.skill.exception.SkillNotFoundException;
 import org.yvl.teamforge.skill.mapper.SkillMapper;
 
 @Service
@@ -27,7 +25,6 @@ public class SkillService {
 
     private final SkillRepository repository;
     private final SkillCategoryRepository categoryRepository;
-    private final UserSkillRepository userSkillRepository;
     private final SkillMapper skillMapper;
 
     public Page<SkillView> getSkills(Pageable pageable) {
@@ -64,8 +61,6 @@ public class SkillService {
     public void deleteSkill(Long skillId) {
         Skill skill = repository.findById(skillId).orElseThrow(() ->
                 new SkillNotFoundException(skillId));
-
-        userSkillRepository.deleteAllBySkillId(skillId);
 
         repository.delete(skill);
     }

@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.Project;
 import org.yvl.teamforge.entity.ProjectRole;
 import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
-import org.yvl.teamforge.exception.ProjectNotFoundException;
-import org.yvl.teamforge.exception.ProjectRoleNotBelongToProjectException;
-import org.yvl.teamforge.exception.ProjectRoleNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectNotFoundException;
+import org.yvl.teamforge.project.exception.ProjectRoleHasTeamMembersException;
+import org.yvl.teamforge.project.exception.ProjectRoleNotBelongToProjectException;
+import org.yvl.teamforge.project.exception.ProjectRoleNotFoundException;
 import org.yvl.teamforge.project.dto.request.ProjectRoleCreateRequest;
 import org.yvl.teamforge.project.dto.request.ProjectRoleUpdateRequest;
 import org.yvl.teamforge.project.dto.response.ProjectRoleView;
@@ -25,9 +26,7 @@ public class ProjectRoleService {
 
     private final ProjectRoleRepository repository;
     private final ProjectRepository projectRepository;
-    private final InvitationRepository invitationRepository;
     private final TeamMemberRepository teamMemberRepository;
-    private final ProjectRoleSkillRepository projectRoleSkillRepository;
     private final ProjectAccessService projectAccessService;
     private final ProjectRoleStatusService projectRoleStatusService;
     private final ProjectMapper mapper;
@@ -93,10 +92,9 @@ public class ProjectRoleService {
             throw new ProjectRoleNotBelongToProjectException(roleId, projectId);
         }
 
-        projectRoleSkillRepository.deleteAllByProjectRoleId(roleId);
-
-        invitationRepository.deleteAllByProjectRoleId(roleId);
-        teamMemberRepository.deleteAllByProjectRoleId(roleId);
+        if (teamMemberRepository.existsByProjectRoleId(roleId)) {
+            throw new ProjectRoleHasTeamMembersException(roleId);
+        }
 
         repository.delete(projectRole);
     }

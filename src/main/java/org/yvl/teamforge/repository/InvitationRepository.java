@@ -13,6 +13,4 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
     boolean existsByProjectRoleIdAndUserIdAndStatus(Long projectRoleId, Long userId, InvitationStatus status);
 
     Page<Invitation> findByUserId(Long userId, Pageable pageable);
-
-    void deleteAllByProjectRoleId(Long projectRoleId);
 }

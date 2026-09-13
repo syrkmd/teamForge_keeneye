@@ -10,7 +10,7 @@ import org.yvl.teamforge.admin.mapper.UserAdminMapper;
 import org.yvl.teamforge.entity.SystemRole;
 import org.yvl.teamforge.entity.User;
 import org.yvl.teamforge.entity.enums.SystemRoleName;
-import org.yvl.teamforge.exception.AdminTargetModificationNotAllowedException;
+import org.yvl.teamforge.admin.exception.AdminTargetModificationNotAllowedException;
 import org.yvl.teamforge.exception.SystemRoleNotFoundException;
 import org.yvl.teamforge.exception.UserNotFoundException;
 import org.yvl.teamforge.repository.SystemRoleRepository;

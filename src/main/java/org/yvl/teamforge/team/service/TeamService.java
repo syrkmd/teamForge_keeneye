@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.*;
 import org.yvl.teamforge.entity.enums.TeamMemberStatus;
 import org.yvl.teamforge.entity.enums.TeamStatus;
-import org.yvl.teamforge.exception.*;
 import org.yvl.teamforge.project.service.ProjectAccessService;
 import org.yvl.teamforge.project.service.ProjectRoleStatusService;
 import org.yvl.teamforge.recommendation.event.TeamCompositionChangedEvent;
@@ -19,6 +18,10 @@ import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.team.dto.request.TeamMemberActionRequest;
 import org.yvl.teamforge.team.dto.response.TeamMemberView;
 import org.yvl.teamforge.team.dto.response.TeamView;
+import org.yvl.teamforge.team.exception.TeamMemberAlreadyInactiveException;
+import org.yvl.teamforge.team.exception.TeamMemberNotFoundException;
+import org.yvl.teamforge.team.exception.TeamNotFoundException;
+import org.yvl.teamforge.team.exception.UserAlreadyTeamMemberException;
 import org.yvl.teamforge.team.mapper.TeamMapper;
 
 import java.time.Instant;
@@ -65,7 +68,6 @@ public class TeamService {
             User user,
             ProjectRole projectRole
     ) {
-
         if (teamMemberRepository.existsByTeamIdAndUserIdAndProjectRoleIdAndStatus(
                 team.getId(),
                 user.getId(),
@@ -111,13 +113,12 @@ public class TeamService {
             Long memberId,
             TeamMemberActionRequest request
     ) {
-        TeamMember teamMember = teamMemberRepository.findById(memberId).orElseThrow(() ->
+        TeamMember teamMember = teamMemberRepository.findByIdAndUserIdAndTeam_Project_Id(
+                memberId,
+                userPrincipal.getUser().getId(),
+                projectId
+        ).orElseThrow(() ->
                 new TeamMemberNotFoundException(memberId));
-
-        if (!teamMember.getUser().getId().equals(userPrincipal.getUser().getId())
-                || !teamMember.getTeam().getProject().getId().equals(projectId)) {
-            throw new TeamMemberAccessDeniedException();
-        }
 
         if (teamMember.getStatus() == TeamMemberStatus.INACTIVE) {
             throw new TeamMemberAlreadyInactiveException();
@@ -136,15 +137,12 @@ public class TeamService {
     ) {
         projectAccessService.getProjectForModification(userPrincipal, projectId);
 
-        TeamMember teamMember = teamMemberRepository.findById(memberId).orElseThrow(() ->
-                new TeamMemberNotFoundException(memberId));
+        TeamMember teamMember = teamMemberRepository.findByIdAndTeam_Project_Id(memberId, projectId)
+                .orElseThrow(() ->
+                        new TeamMemberNotFoundException(memberId));
 
         if (teamMember.getStatus() == TeamMemberStatus.INACTIVE) {
             throw new TeamMemberAlreadyInactiveException();
-        }
-
-        if (!teamMember.getTeam().getProject().getId().equals(projectId)) {
-            throw new TeamMemberAccessDeniedException();
         }
 
         deactivateMember(teamMember, request.getReason());

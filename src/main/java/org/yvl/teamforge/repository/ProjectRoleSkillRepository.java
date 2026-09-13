@@ -21,8 +21,6 @@ public interface ProjectRoleSkillRepository extends JpaRepository<ProjectRoleSki
 
     Optional<ProjectRoleSkill> findByProjectRoleIdAndSkillId(Long projectRoleId, Long skillId);
 
-    void deleteAllByProjectRoleId(Long projectRoleId);
-
     @Query(
             value = """
                 SELECT pr.role_name AS "roleName",
