@@ -65,7 +65,7 @@ public class ProjectService {
                 .template(template)
                 .owner(userPrincipal.getUser())
                 .build());
-
+        // TODO связь получения через onetomany
         List<TemplateRole> templateRoles = templateRoleRepository.findByProjectTemplateId(template.getId());
 
         List<ProjectRole> projectRoles = templateRoles

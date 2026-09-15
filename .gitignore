@@ -39,3 +39,5 @@ out/
 
 *.md
 .env
+
+.DS_Store
