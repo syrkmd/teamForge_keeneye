@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.yvl.teamforge.security.handler.JwtAccessDeniedHandler;
 import org.yvl.teamforge.security.handler.JwtAuthenticationEntryPoint;
-import org.yvl.teamforge.security.jwt.JwtFilter;
+import org.yvl.teamforge.security.jwt.filter.JwtFilter;
 import org.yvl.teamforge.security.user.CustomUserDetailsService;
 
 @Configuration

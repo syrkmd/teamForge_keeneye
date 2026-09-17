@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+notification:
+  notification-exchange-name: notification.events
+  notification-queue-name: notification.service.queue
+  dlx-exchange-name: notification.events.dlx
+  dlq-queue-name: notification.service.queue.dlq
+  routing-key: notification.#
+
+jwt:
+  public-key: ${JWT_PUBLIC_KEY}
+  kid: ${JWT_KID}

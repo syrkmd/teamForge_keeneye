@@ -25,7 +25,7 @@ import org.yvl.teamforge.auth.exception.UserBlockedException;
 import org.yvl.teamforge.exception.SystemRoleNotFoundException;
 import org.yvl.teamforge.repository.SystemRoleRepository;
 import org.yvl.teamforge.repository.UserRepository;
-import org.yvl.teamforge.security.jwt.JwtService;
+import org.yvl.teamforge.security.jwt.service.JwtService;
 import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.refreshToken.service.RefreshTokenService;
 

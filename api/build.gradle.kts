@@ -28,6 +28,8 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.mapstruct:mapstruct:1.6.3")
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-gson:0.13.0")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")

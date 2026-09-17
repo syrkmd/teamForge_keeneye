@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "project_templates")
@@ -29,4 +30,7 @@ public class ProjectTemplate {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "projectTemplate")
+    private List<TemplateRole> templateRoles;
 }

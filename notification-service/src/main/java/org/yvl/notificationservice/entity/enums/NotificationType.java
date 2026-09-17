@@ -1,4 +1,4 @@
-package org.yvl.teamforge.entity.enums;
+package org.yvl.notificationservice.entity.enums;
 
 public enum NotificationType {
 

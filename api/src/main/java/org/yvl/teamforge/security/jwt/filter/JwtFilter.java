@@ -1,4 +1,4 @@
-package org.yvl.teamforge.security.jwt;
+package org.yvl.teamforge.security.jwt.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.yvl.teamforge.security.handler.JwtAuthenticationEntryPoint;
+import org.yvl.teamforge.security.jwt.service.JwtService;
 import org.yvl.teamforge.security.user.CustomUserDetailsService;
 
 import java.io.IOException;
