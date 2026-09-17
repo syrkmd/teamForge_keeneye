@@ -28,3 +28,8 @@ notification:
 jwt:
   public-key: ${JWT_PUBLIC_KEY}
   kid: ${JWT_KID}
+
+sse:
+  timeout: 1800000
+  ticket-ttl: 30000
+  ticket-cleanup-interval: 60000

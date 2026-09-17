@@ -14,7 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.retry.RetryPolicy;
-import org.yvl.notificationservice.consumer.exception.NotificationNotFoundException;
+import org.yvl.notificationservice.exception.NotificationNotFoundException;
 
 import java.time.Duration;
 

@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.yvl.notificationservice.security.handler.JwtAccessDeniedHandler;
 import org.yvl.notificationservice.security.handler.JwtAuthenticationEntryPoint;
 import org.yvl.notificationservice.security.jwt.filter.JwtFilter;
+import org.yvl.notificationservice.security.sse.filter.SseTicketAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +22,7 @@ import org.yvl.notificationservice.security.jwt.filter.JwtFilter;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final SseTicketAuthenticationFilter sseTicketAuthenticationFilter;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAccessDeniedHandler accessDeniedHandler;
 
@@ -38,6 +40,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(sseTicketAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

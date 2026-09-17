@@ -7,8 +7,11 @@ import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.yvl.notificationservice.consumer.event.NotificationEventPayload;
-import org.yvl.notificationservice.consumer.exception.NotificationNotFoundException;
+import org.yvl.notificationservice.exception.NotificationNotFoundException;
+import org.yvl.notificationservice.entity.Notification;
 import org.yvl.notificationservice.repository.NotificationRepository;
+import org.yvl.notificationservice.sse.SseConnectionManager;
+import org.yvl.notificationservice.sse.mapper.NotificationMapper;
 
 import java.io.IOException;
 
@@ -17,6 +20,8 @@ import java.io.IOException;
 public class NotificationEventConsumer {
 
     private final NotificationRepository repository;
+    private final SseConnectionManager sseConnectionManager;
+    private final NotificationMapper mapper;
 
     @RabbitListener(
             queues = "${notification.notification-queue-name}",
@@ -29,8 +34,11 @@ public class NotificationEventConsumer {
     ) throws IOException {
         Long notificationId = payload.getNotificationId();
 
-        repository.findById(notificationId).orElseThrow(() -> new NotificationNotFoundException(notificationId));
+        Notification notification = repository.findById(notificationId).orElseThrow(() ->
+                new NotificationNotFoundException(notificationId));
 
         channel.basicAck(deliveryTag, false);
+
+        sseConnectionManager.push(notification.getUserId(), mapper.toNotificationView(notification));
     }
 }
