@@ -7,11 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.*;
+import org.yvl.teamforge.entity.enums.NotificationType;
 import org.yvl.teamforge.entity.enums.TeamMemberStatus;
 import org.yvl.teamforge.entity.enums.TeamStatus;
+import org.yvl.teamforge.notification.event.NotificationRequestedEvent;
 import org.yvl.teamforge.project.service.ProjectAccessService;
 import org.yvl.teamforge.project.service.ProjectRoleStatusService;
 import org.yvl.teamforge.recommendation.event.TeamCompositionChangedEvent;
+import org.yvl.teamforge.repository.NotificationRepository;
 import org.yvl.teamforge.repository.TeamMemberRepository;
 import org.yvl.teamforge.repository.TeamRepository;
 import org.yvl.teamforge.security.user.UserPrincipal;
@@ -37,6 +40,7 @@ public class TeamService {
     private final ProjectAccessService projectAccessService;
     private final ProjectRoleStatusService projectRoleStatusService;
     private final TeamMapper mapper;
+    private final NotificationRepository notificationRepository;
 
     public TeamView getTeamByProjectId(
             UserPrincipal userPrincipal,
@@ -163,5 +167,28 @@ public class TeamService {
         eventPublisher.publishEvent(
                 new TeamCompositionChangedEvent(teamMember.getTeam().getId())
         );
+
+        Notification notification = notificationRepository.save(Notification.builder()
+                .type(NotificationType.TEAM_MEMBER_LEFT)
+                .user(teamMember.getTeam().getProject().getOwner())
+                .title("Team composition changed")
+                .message(teamMember.getUser().getFirstName() + " "
+                        + teamMember.getUser().getLastName()
+                        + " is no longer participating in the project "
+                        + teamMember.getTeam().getProject().getName()
+                        + " (role: "
+                        + teamMember.getProjectRole().getRoleName()
+                        + ").")
+                .isRead(false)
+                .createdAt(Instant.now())
+                .invitation(null)
+                .team(teamMember.getTeam())
+                .build());
+
+        eventPublisher.publishEvent(new NotificationRequestedEvent(
+                notification.getId(),
+                teamMember.getTeam().getProject().getOwner().getId(),
+                notification.getType()
+        ));
     }
 }

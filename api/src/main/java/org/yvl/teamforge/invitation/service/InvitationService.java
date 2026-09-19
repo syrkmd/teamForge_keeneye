@@ -1,32 +1,30 @@
 package org.yvl.teamforge.invitation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yvl.teamforge.entity.*;
-import org.yvl.teamforge.entity.enums.InvitationStatus;
-import org.yvl.teamforge.entity.enums.ProjectRoleStatus;
-import org.yvl.teamforge.entity.enums.TeamStatus;
+import org.yvl.teamforge.entity.enums.*;
 import org.yvl.teamforge.exception.UserNotFoundException;
 import org.yvl.teamforge.invitation.exception.InvitationAccessDeniedException;
 import org.yvl.teamforge.invitation.exception.InvitationAlreadyExistsException;
 import org.yvl.teamforge.invitation.exception.InvitationAlreadyRespondedException;
 import org.yvl.teamforge.invitation.exception.InvitationNotFoundException;
+import org.yvl.teamforge.notification.event.NotificationRequestedEvent;
+import org.yvl.teamforge.repository.*;
 import org.yvl.teamforge.team.exception.TeamNotFoundException;
 import org.yvl.teamforge.invitation.dto.request.InvitationCreateRequest;
 import org.yvl.teamforge.invitation.dto.response.InvitationView;
 import org.yvl.teamforge.invitation.mapper.InvitationMapper;
 import org.yvl.teamforge.project.service.ProjectAccessService;
-import org.yvl.teamforge.repository.InvitationRepository;
-import org.yvl.teamforge.repository.ProjectRoleRepository;
-import org.yvl.teamforge.repository.TeamRepository;
-import org.yvl.teamforge.repository.UserRepository;
 import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.team.service.TeamService;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +38,9 @@ public class InvitationService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final ProjectRoleRepository projectRoleRepository;
+    private final NotificationRepository notificationRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Page<InvitationView> getInvitations(
             UserPrincipal userPrincipal,
@@ -76,6 +77,16 @@ public class InvitationService {
                 .user(user)
                 .build());
 
+        createAndPublishNotification(
+                user,
+                NotificationType.INVITATION_RECEIVED,
+                "New project invitation",
+                "You have been invited to the role " + projectRole.getRoleName()
+                        + " in the project " + projectRole.getProject().getName(),
+                invitation,
+                null
+        );
+
         return mapper.toInvitationView(invitation);
     }
 
@@ -87,6 +98,17 @@ public class InvitationService {
 
         invitation.setStatus(InvitationStatus.DECLINED);
         invitation.setRespondedAt(Instant.now());
+
+        createAndPublishNotification(
+                invitation.getProject().getOwner(),
+                NotificationType.INVITATION_REJECTED,
+                "Invitation declined",
+                "The invitation for the role " + invitation.getProjectRole().getRoleName()
+                        + " in the project " + invitation.getProject().getName()
+                        + " was declined by " + userPrincipal.getUser().getLastName() + " " + userPrincipal.getUser().getFirstName(),
+                invitation,
+                null
+        );
 
         return mapper.toInvitationView(invitation);
     }
@@ -111,8 +133,45 @@ public class InvitationService {
         invitation.setStatus(InvitationStatus.ACCEPTED);
         invitation.setRespondedAt(Instant.now());
 
+        createAndPublishNotification(
+                project.getOwner(),
+                NotificationType.INVITATION_ACCEPTED,
+                "Invitation accepted",
+                "The invitation for the role " + projectRole.getRoleName()
+                        + " in the project " + project.getName()
+                        + " was accepted by " + userPrincipal.getUser().getLastName() + " " + userPrincipal.getUser().getFirstName(),
+                invitation,
+                null
+        );
+
+        boolean wasCompletedBefore = team.getStatus() == TeamStatus.COMPLETED;
+
         if (!projectRoleRepository.existsByProjectIdAndStatus(project.getId(), ProjectRoleStatus.OPEN)) {
             team.setStatus(TeamStatus.COMPLETED);
+        }
+
+        if (!wasCompletedBefore && team.getStatus() == TeamStatus.COMPLETED) {
+            createAndPublishNotification(
+                    project.getOwner(),
+                    NotificationType.TEAM_FORMATION_COMPLETED,
+                    "Team formed",
+                    "The team for project " + project.getName() + " is fully staffed.",
+                    null,
+                    team
+            );
+
+            List<TeamMember> teamMembers = teamMemberRepository.findByTeamIdAndStatus(team.getId(), TeamMemberStatus.ACTIVE);
+
+            teamMembers.forEach(member ->
+                createAndPublishNotification(
+                        member.getUser(),
+                        NotificationType.TEAM_FORMATION_COMPLETED,
+                        "Team formed",
+                        "The team for project " + project.getName() + " is fully staffed.",
+                        null,
+                        team
+                )
+            );
         }
 
         return mapper.toInvitationView(invitation);
@@ -141,5 +200,31 @@ public class InvitationService {
         }
 
         return invitation;
+    }
+
+    private void createAndPublishNotification(
+            User user,
+            NotificationType type,
+            String title,
+            String message,
+            Invitation invitation,
+            Team team
+    ) {
+        Notification notification = notificationRepository.save(Notification.builder()
+                .type(type)
+                .user(user)
+                .title(title)
+                .message(message)
+                .isRead(false)
+                .createdAt(Instant.now())
+                .invitation(invitation)
+                .team(team)
+                .build());
+
+        applicationEventPublisher.publishEvent(new NotificationRequestedEvent(
+                notification.getId(),
+                user.getId(),
+                notification.getType()
+        ));
     }
 }

@@ -1,6 +1,5 @@
 package org.yvl.teamforge.recommendation.event;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

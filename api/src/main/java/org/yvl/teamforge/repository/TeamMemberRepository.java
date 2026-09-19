@@ -22,4 +22,6 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     Page<TeamMember> findByTeamId(Long teamId, Pageable pageable);
 
     Optional<TeamMember> findByIdAndTeam_Project_Id(Long id, Long projectId);
+
+    List<TeamMember> findByTeamIdAndStatus(Long teamId, TeamMemberStatus status);
 }

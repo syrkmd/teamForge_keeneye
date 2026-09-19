@@ -30,3 +30,6 @@ analytics:
 
 recommendation:
   fallback-delay: 900000
+
+notification:
+  notification-exchange-name: notification.events
