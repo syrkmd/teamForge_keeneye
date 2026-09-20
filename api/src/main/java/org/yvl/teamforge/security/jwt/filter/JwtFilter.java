@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.yvl.teamforge.security.handler.JwtAuthenticationEntryPoint;
 import org.yvl.teamforge.security.jwt.service.JwtService;
 import org.yvl.teamforge.security.user.CustomUserDetailsService;
+import org.yvl.teamforge.security.user.UserPrincipal;
 
 import java.io.IOException;
 
@@ -48,9 +49,24 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             Claims claims = jwtService.getClaims(token);
+
+            Long userId = claims.get("userId", Long.class);
+
+            if (userId == null) {
+                throw new JwtException("JWT does not contain userId");
+            }
+
             String userEmail = claims.getSubject();
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+
+            if (!(userDetails instanceof UserPrincipal userPrincipal)) {
+                throw new JwtException("Invalid authenticated principal");
+            }
+
+            if (!userPrincipal.getUser().getId().equals(userId)) {
+                throw new JwtException("JWT userId does not match authenticated user");
+            }
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(

@@ -1,6 +1,8 @@
 package org.yvl.teamforge.security.jwt.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -60,11 +62,18 @@ public class JwtService {
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parser()
+        Jws<Claims> jws = Jwts.parser()
                 .verifyWith(publicKey)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseSignedClaims(token);
+
+        String kid = jws.getHeader().getKeyId();
+
+        if (!properties.getKid().equals(kid)) {
+            throw new JwtException("Invalid JWT key id");
+        }
+
+        return jws.getPayload();
     }
 
     private PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {

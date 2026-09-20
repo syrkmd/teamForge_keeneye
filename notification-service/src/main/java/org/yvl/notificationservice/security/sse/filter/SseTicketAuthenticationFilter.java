@@ -5,9 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.yvl.notificationservice.security.handler.JwtAuthenticationEntryPoint;
@@ -23,6 +26,12 @@ public class SseTicketAuthenticationFilter extends OncePerRequestFilter {
 
     private final SseTicketService sseTicketService;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private static final RequestMatcher REQUEST_MATCHER = PathPatternRequestMatcher.pathPattern(HttpMethod.GET, "/sse/stream");
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return !REQUEST_MATCHER.matches(request);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

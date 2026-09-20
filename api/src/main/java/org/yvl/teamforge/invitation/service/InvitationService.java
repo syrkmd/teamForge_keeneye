@@ -24,7 +24,9 @@ import org.yvl.teamforge.security.user.UserPrincipal;
 import org.yvl.teamforge.team.service.TeamService;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -151,20 +153,19 @@ public class InvitationService {
         }
 
         if (!wasCompletedBefore && team.getStatus() == TeamStatus.COMPLETED) {
-            createAndPublishNotification(
-                    project.getOwner(),
-                    NotificationType.TEAM_FORMATION_COMPLETED,
-                    "Team formed",
-                    "The team for project " + project.getName() + " is fully staffed.",
-                    null,
-                    team
-            );
+            Map<Long, User> recipients = new LinkedHashMap<>();
+
+            recipients.put(project.getOwner().getId(), project.getOwner());
 
             List<TeamMember> teamMembers = teamMemberRepository.findByTeamIdAndStatus(team.getId(), TeamMemberStatus.ACTIVE);
 
             teamMembers.forEach(member ->
+                recipients.putIfAbsent(member.getUser().getId(), member.getUser())
+            );
+
+            recipients.values().forEach(user ->
                 createAndPublishNotification(
-                        member.getUser(),
+                        user,
                         NotificationType.TEAM_FORMATION_COMPLETED,
                         "Team formed",
                         "The team for project " + project.getName() + " is fully staffed.",

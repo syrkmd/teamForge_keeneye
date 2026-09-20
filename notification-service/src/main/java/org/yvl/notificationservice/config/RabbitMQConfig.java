@@ -2,12 +2,15 @@ package org.yvl.notificationservice.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.listener.ListenerExecutionFailedException;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptor;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
+import org.springframework.amqp.rabbit.retry.MessageRecoverer;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,6 +21,7 @@ import org.yvl.notificationservice.exception.NotificationNotFoundException;
 
 import java.time.Duration;
 
+@Slf4j
 @Getter
 @Setter
 @Configuration
@@ -90,19 +94,31 @@ public class RabbitMQConfig {
                 .build();
     }
 
+
     @Bean
-    public RejectAndDontRequeueRecoverer rejectAndDontRequeueRecoverer() {
-        return new RejectAndDontRequeueRecoverer();
+    public MessageRecoverer messageRecoverer() {
+        return (message, cause) -> {
+            log.warn(
+                    "Retries exhausted, rejecting message without requeue (-> DLQ): {}",
+                    message,
+                    cause
+            );
+            throw new ListenerExecutionFailedException(
+                    "Retry Policy Exhausted",
+                    new AmqpRejectAndDontRequeueException("Rejecting message after retry exhaustion", true, cause),
+                    message
+            );
+        };
     }
 
     @Bean
     public StatelessRetryOperationsInterceptor retryInterceptor(
             RetryPolicy retryPolicy,
-            RejectAndDontRequeueRecoverer rejectAndDontRequeueRecoverer
+            MessageRecoverer messageRecoverer
     ) {
         return RetryInterceptorBuilder.stateless()
                 .retryPolicy(retryPolicy)
-                .recoverer(rejectAndDontRequeueRecoverer)
+                .recoverer(messageRecoverer)
                 .build();
     }
 
