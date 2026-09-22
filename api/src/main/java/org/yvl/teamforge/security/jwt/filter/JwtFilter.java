@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.yvl.teamforge.security.handler.JwtAuthenticationEntryPoint;
@@ -84,7 +85,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     response,
                     new BadCredentialsException("JWT expired", e)
             );
-        } catch (JwtException e) {
+        } catch (JwtException | UsernameNotFoundException e) {
             authenticationEntryPoint.commence(
                     request,
                     response,
