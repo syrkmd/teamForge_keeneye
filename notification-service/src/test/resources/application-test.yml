@@ -1,0 +1,3 @@
+jwt:
+  public-key: ${JWT_PUBLIC_KEY}
+  kid: ${JWT_KID}
