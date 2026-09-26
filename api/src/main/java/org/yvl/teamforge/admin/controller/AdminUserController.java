@@ -18,11 +18,11 @@ import org.yvl.teamforge.admin.service.AdminUserService;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
 
     private final AdminUserService service;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public Page<UserAdminView> getUsers(
             @Min(0) @RequestParam(defaultValue = "0") int page,
@@ -31,7 +31,6 @@ public class AdminUserController {
         return service.getUsers(PageRequest.of(page, size));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/users/{userId}/role")
     public UserAdminView patchRole(
             @PathVariable Long userId,
@@ -40,7 +39,6 @@ public class AdminUserController {
         return service.changeRole(userId, request.getRole());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/users/{userId}/status")
     public UserAdminView patchStatus(
             @PathVariable Long userId,

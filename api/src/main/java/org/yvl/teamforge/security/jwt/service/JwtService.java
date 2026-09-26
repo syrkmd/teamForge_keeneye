@@ -35,6 +35,7 @@ public class JwtService {
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
                 .claim("userId", userPrincipal.getUser().getId())
+                .claim("role", userPrincipal.getUser().getSystemRole().getName().name())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + properties.getAccessExpiration()))
                 .header().keyId(properties.getKid()).and()

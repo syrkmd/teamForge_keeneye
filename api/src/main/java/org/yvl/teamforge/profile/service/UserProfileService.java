@@ -22,7 +22,10 @@ public class UserProfileService {
     private final UserRepository userRepository;
 
     public UserProfileView getProfile(UserPrincipal userPrincipal) {
-        return userProfileMapper.toProfileView(userPrincipal.getUser());
+        User user = userRepository.findById(userPrincipal.getUser().getId()).orElseThrow(() ->
+                new UserNotFoundException(userPrincipal.getUser().getId()));
+
+        return userProfileMapper.toProfileView(user);
     }
 
     public UserProfileView profileUpdate(UserPrincipal userPrincipal, ProfileUpdateRequest request) {

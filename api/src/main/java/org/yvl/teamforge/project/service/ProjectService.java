@@ -1,5 +1,6 @@
 package org.yvl.teamforge.project.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +34,10 @@ public class ProjectService {
     private final ProjectTemplateRepository templateRepository;
     private final ProjectRoleRepository projectRoleRepository;
     private final ProjectRoleSkillRepository projectRoleSkillRepository;
-    private final TemplateRoleRepository templateRoleRepository;
     private final TemplateRoleSkillRepository templateRoleSkillRepository;
     private final ProjectAccessService projectAccessService;
     private final ProjectMapper mapper;
+    private final EntityManager entityManager;
 
     public Page<ProjectView> getProjects(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toProjectView);
@@ -55,6 +56,11 @@ public class ProjectService {
 
         Instant now = Instant.now();
 
+        User owner = entityManager.getReference(
+                User.class,
+                userPrincipal.getUser().getId()
+        );
+
         Project project = repository.save(Project.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -63,7 +69,7 @@ public class ProjectService {
                 .createdAt(now)
                 .updatedAt(now)
                 .template(template)
-                .owner(userPrincipal.getUser())
+                .owner(owner)
                 .build());
 
         List<TemplateRole> templateRoles = template.getTemplateRoles();

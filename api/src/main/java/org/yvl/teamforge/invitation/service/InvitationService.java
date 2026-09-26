@@ -98,6 +98,9 @@ public class InvitationService {
     ) {
         Invitation invitation = getPendingInvitation(userPrincipal, invitationId);
 
+        User currentUser = userRepository.findById(userPrincipal.getUser().getId()).orElseThrow(() ->
+                new UserNotFoundException(userPrincipal.getUser().getId()));
+
         invitation.setStatus(InvitationStatus.DECLINED);
         invitation.setRespondedAt(Instant.now());
 
@@ -107,7 +110,7 @@ public class InvitationService {
                 "Invitation declined",
                 "The invitation for the role " + invitation.getProjectRole().getRoleName()
                         + " in the project " + invitation.getProject().getName()
-                        + " was declined by " + userPrincipal.getUser().getLastName() + " " + userPrincipal.getUser().getFirstName(),
+                        + " was declined by " + currentUser.getLastName() + " " + currentUser.getFirstName(),
                 invitation,
                 null
         );
@@ -121,6 +124,9 @@ public class InvitationService {
     ) {
         Invitation invitation = getPendingInvitation(userPrincipal, invitationId);
 
+        User currentUser = userRepository.findById(userPrincipal.getUser().getId()).orElseThrow(() ->
+                new UserNotFoundException(userPrincipal.getUser().getId()));
+
         ProjectRole projectRole = invitation.getProjectRole();
 
         Project project = invitation.getProject();
@@ -130,7 +136,7 @@ public class InvitationService {
         Team team = teamRepository.findByProjectId(project.getId()).orElseThrow(() ->
                 new TeamNotFoundException(project.getId()));
 
-        teamService.addMember(team, userPrincipal.getUser(), projectRole);
+        teamService.addMember(team, currentUser, projectRole);
 
         invitation.setStatus(InvitationStatus.ACCEPTED);
         invitation.setRespondedAt(Instant.now());
@@ -141,7 +147,7 @@ public class InvitationService {
                 "Invitation accepted",
                 "The invitation for the role " + projectRole.getRoleName()
                         + " in the project " + project.getName()
-                        + " was accepted by " + userPrincipal.getUser().getLastName() + " " + userPrincipal.getUser().getFirstName(),
+                        + " was accepted by " + currentUser.getLastName() + " " + currentUser.getFirstName(),
                 invitation,
                 null
         );

@@ -1,5 +1,6 @@
 package org.yvl.teamforge.skill.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class UserSkillService {
     private final SkillRepository skillRepository;
     private final SkillCategoryRepository skillCategoryRepository;
     private final SkillMapper skillMapper;
+    private final EntityManager entityManager;
 
     public Page<UserSkillView> getSkills(UserPrincipal userPrincipal, Pageable pageable) {
 
@@ -48,7 +50,10 @@ public class UserSkillService {
 
     public UserSkillView addSkill(UserPrincipal userPrincipal, UserSkillRequest request) {
 
-        User user = userPrincipal.getUser();
+        User user = entityManager.getReference(
+                User.class,
+                userPrincipal.getUser().getId()
+        );
 
         Skill skill = request.getSkillId() != null
                 ? getExistingSkill(user, request.getSkillId())

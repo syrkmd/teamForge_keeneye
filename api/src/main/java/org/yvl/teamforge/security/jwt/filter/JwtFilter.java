@@ -11,13 +11,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.yvl.teamforge.entity.SystemRole;
+import org.yvl.teamforge.entity.User;
+import org.yvl.teamforge.entity.enums.SystemRoleName;
 import org.yvl.teamforge.security.handler.JwtAuthenticationEntryPoint;
 import org.yvl.teamforge.security.jwt.service.JwtService;
-import org.yvl.teamforge.security.user.CustomUserDetailsService;
 import org.yvl.teamforge.security.user.UserPrincipal;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
@@ -57,35 +57,50 @@ public class JwtFilter extends OncePerRequestFilter {
                 throw new JwtException("JWT does not contain userId");
             }
 
-            String userEmail = claims.getSubject();
+            String role = claims.get("role", String.class);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-
-            if (!(userDetails instanceof UserPrincipal userPrincipal)) {
-                throw new JwtException("Invalid authenticated principal");
+            if (role == null) {
+                throw new JwtException("JWT does not contain role");
             }
 
-            if (!userPrincipal.getUser().getId().equals(userId)) {
-                throw new JwtException("JWT userId does not match authenticated user");
+            SystemRoleName roleName;
+
+            try {
+                roleName = SystemRoleName.valueOf(role);
+            } catch (IllegalArgumentException e) {
+                throw new JwtException("Invalid JWT role", e);
             }
+
+            SystemRole systemRole = SystemRole.builder()
+                    .name(roleName)
+                    .build();
+
+            User user = User.builder()
+                    .id(userId)
+                    .systemRole(systemRole)
+                    .isActive(true)
+                    .build();
+
+            UserPrincipal userPrincipal = new UserPrincipal(user);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            userPrincipal,
                             null,
-                            userDetails.getAuthorities()
+                            userPrincipal.getAuthorities()
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
+
         } catch (ExpiredJwtException e) {
             authenticationEntryPoint.commence(
                     request,
                     response,
                     new BadCredentialsException("JWT expired", e)
             );
-        } catch (JwtException | UsernameNotFoundException e) {
+        } catch (JwtException e) {
             authenticationEntryPoint.commence(
                     request,
                     response,
