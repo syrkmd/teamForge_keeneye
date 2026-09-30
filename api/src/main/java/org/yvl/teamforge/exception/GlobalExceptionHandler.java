@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.yvl.teamforge.admin.exception.AdminTargetModificationNotAllowedException;
-import org.yvl.teamforge.auth.exception.EmailAlreadyExistsException;
-import org.yvl.teamforge.auth.exception.InvalidAuthenticatedPrincipal;
-import org.yvl.teamforge.auth.exception.InvalidCredentialsException;
-import org.yvl.teamforge.auth.exception.UserBlockedException;
 import org.yvl.teamforge.analytics.exception.TeamAnalyticsNotFoundException;
 import org.yvl.teamforge.exception.dto.ApiError;
 import org.yvl.teamforge.invitation.exception.InvitationAccessDeniedException;
@@ -29,7 +25,6 @@ import org.yvl.teamforge.project.exception.ProjectRoleNotOpenException;
 import org.yvl.teamforge.project.exception.ProjectRoleSkillAlreadyExistsException;
 import org.yvl.teamforge.project.exception.ProjectRoleSkillNotFoundException;
 import org.yvl.teamforge.project.exception.ProjectTemplateNotFoundException;
-import org.yvl.teamforge.refreshToken.exception.InvalidRefreshTokenException;
 import org.yvl.teamforge.skill.exception.SkillAlreadyExistsException;
 import org.yvl.teamforge.skill.exception.SkillCategoryNotFoundException;
 import org.yvl.teamforge.skill.exception.SkillNotFoundException;
@@ -44,21 +39,6 @@ import org.yvl.teamforge.team.exception.UserAlreadyTeamMemberException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({
-            InvalidRefreshTokenException.class,
-            InvalidCredentialsException.class
-    })
-    public ApiError handleUnauthorized(RuntimeException exception) {
-        return new ApiError(exception.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidAuthenticatedPrincipal.class)
-    public ApiError handleInvalidAuthenticatedPrincipal(InvalidAuthenticatedPrincipal exception) {
-        return new ApiError(exception.getMessage());
-    }
-
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({
             SystemRoleNotFoundException.class,
@@ -70,7 +50,6 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler({
-            UserBlockedException.class,
             ProjectAccessDeniedException.class,
             InvitationAccessDeniedException.class,
             TeamMemberAccessDeniedException.class
@@ -112,8 +91,7 @@ public class GlobalExceptionHandler {
             InvitationAlreadyExistsException.class,
             UserAlreadyTeamMemberException.class,
             InvitationAlreadyRespondedException.class,
-            TeamMemberAlreadyInactiveException.class,
-            EmailAlreadyExistsException.class
+            TeamMemberAlreadyInactiveException.class
     })
     public ApiError handleConflict(RuntimeException exception) {
         return new ApiError(exception.getMessage());

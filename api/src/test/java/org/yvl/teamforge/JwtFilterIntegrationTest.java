@@ -1,5 +1,6 @@
 package org.yvl.teamforge;
 
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,14 @@ import org.yvl.teamforge.config.JwtProperties;
 import org.yvl.teamforge.entity.SystemRole;
 import org.yvl.teamforge.entity.User;
 import org.yvl.teamforge.entity.enums.SystemRoleName;
-import org.yvl.teamforge.security.jwt.service.JwtService;
 import org.yvl.teamforge.security.user.UserPrincipal;
+
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,9 +37,6 @@ public class JwtFilterIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JwtService jwtService;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -57,7 +61,7 @@ public class JwtFilterIntegrationTest {
 
         UserPrincipal userPrincipal = new UserPrincipal(user);
 
-        String token = jwtService.generateAccessToken(userPrincipal);
+        String token = generateTestAccessToken(userPrincipal, 900_000);
 
         mockMvc.perform(
                         get("/admin/users")
@@ -81,7 +85,7 @@ public class JwtFilterIntegrationTest {
 
         UserPrincipal userPrincipal = new UserPrincipal(user);
 
-        String token = jwtService.generateAccessToken(userPrincipal);
+        String token = generateTestAccessToken(userPrincipal, 900_000);
 
         mockMvc.perform(
                         get("/admin/users")
@@ -105,20 +109,37 @@ public class JwtFilterIntegrationTest {
 
         UserPrincipal userPrincipal = new UserPrincipal(user);
 
-        long originalExpiration = jwtProperties.getAccessExpiration();
+        String token = generateTestAccessToken(userPrincipal, -1);
 
-        try {
-            jwtProperties.setAccessExpiration(-1);
+        mockMvc.perform(
+                        get("/admin/users")
+                                .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isUnauthorized());
+    }
 
-            String token = jwtService.generateAccessToken(userPrincipal);
+    private String generateTestAccessToken(UserPrincipal userPrincipal, long expirationMillis) throws Exception {
+        return Jwts.builder()
+                .subject(userPrincipal.getUsername())
+                .claim("userId", userPrincipal.getUser().getId())
+                .claim("role", userPrincipal.getUser().getSystemRole().getName().name())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .header().keyId(jwtProperties.getKid()).and()
+                .signWith(loadTestPrivateKey(), Jwts.SIG.ES256)
+                .compact();
+    }
 
-            mockMvc.perform(
-                            get("/admin/users")
-                                    .header("Authorization", "Bearer " + token)
-                    )
-                    .andExpect(status().isUnauthorized());
-        } finally {
-            jwtProperties.setAccessExpiration(originalExpiration);
-        }
+    private PrivateKey loadTestPrivateKey() throws Exception {
+        String encodedPrivateKey = System.getenv("JWT_PRIVATE_KEY");
+        String pem = new String(Base64.getDecoder().decode(encodedPrivateKey), StandardCharsets.UTF_8);
+        String key = pem
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] keyBytes = Base64.getDecoder().decode(key);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        return keyFactory.generatePrivate(keySpec);
     }
 }

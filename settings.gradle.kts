@@ -1,3 +1,3 @@
 rootProject.name = "teamForge"
 
-include("api", "notification-service")
+include("api", "notification-service", "authentication-service")

@@ -1,9 +1,11 @@
-package org.yvl.teamforge.entity;
+package org.yvl.authenticationservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
