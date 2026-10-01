@@ -39,10 +39,16 @@ public class Project {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id", nullable = false)
+    @JoinColumn(name = "template_id", nullable = false, insertable = false, updatable = false)
     private ProjectTemplate template;
 
+    @Column(name = "template_id", nullable = false)
+    private Long templateId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id", nullable = false, insertable = false, updatable = false)
     private User owner;
+
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 }

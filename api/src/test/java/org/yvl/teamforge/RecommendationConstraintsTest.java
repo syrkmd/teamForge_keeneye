@@ -66,6 +66,7 @@ public class RecommendationConstraintsTest {
                 .completedProjectsCount(0)
                 .completionRate(0.0)
                 .systemRole(systemRole)
+                .systemRoleId(systemRole.getId())
                 .build();
 
         userRepository.save(user);
@@ -87,7 +88,9 @@ public class RecommendationConstraintsTest {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .template(template)
+                .templateId(template.getId())
                 .owner(user)
+                .ownerId(user.getId())
                 .build();
 
         projectRepository.save(project);
@@ -107,6 +110,7 @@ public class RecommendationConstraintsTest {
                 .status(RecommendationStatus.OPEN)
                 .createdAt(Instant.now())
                 .team(team)
+                .teamId(team.getId())
                 .build();
 
         recommendationRepository.saveAndFlush(recommendation);
@@ -118,6 +122,7 @@ public class RecommendationConstraintsTest {
                 .status(RecommendationStatus.OPEN)
                 .createdAt(Instant.now())
                 .team(team)
+                .teamId(team.getId())
                 .build();
 
         assertThrows(

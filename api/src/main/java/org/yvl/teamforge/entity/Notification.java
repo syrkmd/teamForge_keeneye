@@ -36,14 +36,23 @@ public class Notification {
     private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "related_invitation_id")
-    private Invitation invitation;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "related_team_id")
+    @JoinColumn(name = "related_invitation_id", insertable = false, updatable = false)
+    private Invitation invitation;
+
+    @Column(name = "related_invitation_id")
+    private Long invitationId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "related_team_id", insertable = false, updatable = false)
     private Team team;
+
+    @Column(name = "related_team_id")
+    private Long teamId;
 }

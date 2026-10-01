@@ -51,6 +51,7 @@ public class SkillService {
                 Skill.builder()
                         .name(request.getName())
                         .category(category)
+                        .categoryId(category.getId())
                         .type(TypeSkill.GLOBAL)
                         .build()
         );

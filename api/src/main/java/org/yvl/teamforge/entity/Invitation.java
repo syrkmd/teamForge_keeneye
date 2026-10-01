@@ -30,14 +30,23 @@ public class Invitation {
     private Instant respondedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id", nullable = false, insertable = false, updatable = false)
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_role_id", nullable = false)
-    private ProjectRole projectRole;
+    @Column(name = "project_id", nullable = false)
+    private Long projectId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "project_role_id", nullable = false, insertable = false, updatable = false)
+    private ProjectRole projectRole;
+
+    @Column(name = "project_role_id", nullable = false)
+    private Long projectRoleId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

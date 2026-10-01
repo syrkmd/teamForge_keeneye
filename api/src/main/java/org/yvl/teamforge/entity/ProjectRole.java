@@ -31,6 +31,9 @@ public class ProjectRole {
     private ProjectRoleStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id", nullable = false, insertable = false, updatable = false)
     private Project project;
+
+    @Column(name = "project_id", nullable = false)
+    private Long projectId;
 }

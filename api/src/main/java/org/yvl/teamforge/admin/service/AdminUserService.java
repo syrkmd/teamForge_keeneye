@@ -41,6 +41,7 @@ public class AdminUserService {
         }
 
         user.setSystemRole(systemRole);
+        user.setSystemRoleId(systemRole.getId());
 
         return userMapper.toAdminView(user);
     }

@@ -40,6 +40,9 @@ public class AuthService {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
+        var systemRole = systemRoleRepository.findByName(SystemRoleName.USER).orElseThrow(() ->
+                new SystemRoleNotFoundException(SystemRoleName.USER));
+
         User user = userRepository.save(
                 User.builder()
                         .email(request.getEmail())
@@ -55,10 +58,8 @@ public class AuthService {
                         .reviewsCount(0)
                         .completedProjectsCount(0)
                         .completionRate(0.0)
-                        .systemRole(
-                                systemRoleRepository.findByName(SystemRoleName.USER).orElseThrow(() ->
-                                        new SystemRoleNotFoundException(SystemRoleName.USER))
-                        )
+                        .systemRole(systemRole)
+                        .systemRoleId(systemRole.getId())
                         .build()
         );
 

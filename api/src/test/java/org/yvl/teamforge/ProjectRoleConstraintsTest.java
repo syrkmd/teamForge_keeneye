@@ -78,6 +78,7 @@ public class ProjectRoleConstraintsTest {
                 .completedProjectsCount(0)
                 .completionRate(0.0)
                 .systemRole(systemRole)
+                .systemRoleId(systemRole.getId())
                 .build();
 
         userRepository.save(user);
@@ -99,7 +100,9 @@ public class ProjectRoleConstraintsTest {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .template(template)
+                .templateId(template.getId())
                 .owner(user)
+                .ownerId(user.getId())
                 .build();
 
         projectRepository.save(project);
@@ -110,6 +113,7 @@ public class ProjectRoleConstraintsTest {
                 .requiredCount(1)
                 .status(ProjectRoleStatus.OPEN)
                 .project(project)
+                .projectId(project.getId())
                 .build();
 
         projectRoleRepository.saveAndFlush(role);
@@ -122,6 +126,7 @@ public class ProjectRoleConstraintsTest {
                 .name("Cascade skill")
                 .type(TypeSkill.GLOBAL)
                 .category(category)
+                .categoryId(category.getId())
                 .build();
 
         skillRepository.saveAndFlush(skill);
@@ -129,7 +134,9 @@ public class ProjectRoleConstraintsTest {
         ProjectRoleSkill roleSkill = ProjectRoleSkill.builder()
                 .minLevel(1)
                 .projectRole(role)
+                .projectRoleId(role.getId())
                 .skill(skill)
+                .skillId(skill.getId())
                 .build();
 
         projectRoleSkillRepository.saveAndFlush(roleSkill);
@@ -138,8 +145,11 @@ public class ProjectRoleConstraintsTest {
                 .status(InvitationStatus.PENDING)
                 .createdAt(Instant.now())
                 .project(project)
+                .projectId(project.getId())
                 .projectRole(role)
+                .projectRoleId(role.getId())
                 .user(user)
+                .userId(user.getId())
                 .build();
 
         invitationRepository.saveAndFlush(invitation);

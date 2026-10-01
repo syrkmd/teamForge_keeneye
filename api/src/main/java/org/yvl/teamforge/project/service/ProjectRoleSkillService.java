@@ -65,8 +65,10 @@ public class ProjectRoleSkillService {
         ProjectRoleSkill projectRoleSkill = repository.save(
                 ProjectRoleSkill.builder()
                         .projectRole(projectRole)
+                        .projectRoleId(projectRole.getId())
                         .minLevel(request.getMinLevel())
                         .skill(skill)
+                        .skillId(skill.getId())
                         .build()
         );
 

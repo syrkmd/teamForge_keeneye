@@ -34,14 +34,23 @@ public class TeamMember {
     private Instant leftAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
+    @JoinColumn(name = "team_id", nullable = false, insertable = false, updatable = false)
     private Team team;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "team_id", nullable = false)
+    private Long teamId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_role_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private User user;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_role_id", nullable = false, insertable = false, updatable = false)
     private ProjectRole projectRole;
+
+    @Column(name = "project_role_id", nullable = false)
+    private Long projectRoleId;
 }

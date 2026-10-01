@@ -40,8 +40,8 @@ public class RecommendationGenerationService {
     ) {
         log.info(
                 "Recommendation generation started: teamId={}",
-                teamId)
-        ;
+                teamId
+        );
 
         Optional<Team> optionalTeam = teamRepository.findById(teamId);
 
@@ -95,6 +95,7 @@ public class RecommendationGenerationService {
                 Recommendation recommendation = recommendationRepository.save(
                         Recommendation.builder()
                                 .team(team)
+                                .teamId(team.getId())
                                 .title(titleRecommendation)
                                 .description(descriptionRecommendation)
                                 .priority(recommendationPriority)

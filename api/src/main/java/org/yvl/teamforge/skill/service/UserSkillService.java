@@ -63,8 +63,10 @@ public class UserSkillService {
         UserSkill userSkill = userSkillRepository.save(
                 UserSkill.builder()
                         .user(user)
+                        .userId(user.getId())
                         .level(request.getLevel())
                         .skill(skill)
+                        .skillId(skill.getId())
                         .build()
         );
 
@@ -110,8 +112,10 @@ public class UserSkillService {
                         Skill.builder()
                                 .name(request.getSkillName())
                                 .category(skillCategory)
+                                .categoryId(skillCategory.getId())
                                 .type(TypeSkill.CUSTOM)
                                 .createdByUser(user)
+                                .createdByUserId(user.getId())
                                 .build()
                 ));
     }

@@ -84,8 +84,11 @@ public class TeamService {
         TeamMember teamMember = teamMemberRepository.save(
                 TeamMember.builder()
                         .team(team)
+                        .teamId(team.getId())
                         .user(user)
+                        .userId(user.getId())
                         .projectRole(projectRole)
+                        .projectRoleId(projectRole.getId())
                         .status(TeamMemberStatus.ACTIVE)
                         .joinedAt(Instant.now())
                         .build()
@@ -168,9 +171,12 @@ public class TeamService {
                 new TeamCompositionChangedEvent(teamMember.getTeam().getId())
         );
 
+        User owner = teamMember.getTeam().getProject().getOwner();
+
         Notification notification = notificationRepository.save(Notification.builder()
                 .type(NotificationType.TEAM_MEMBER_LEFT)
-                .user(teamMember.getTeam().getProject().getOwner())
+                .user(owner)
+                .userId(owner.getId())
                 .title("Team composition changed")
                 .message(teamMember.getUser().getFirstName() + " "
                         + teamMember.getUser().getLastName()
@@ -182,7 +188,9 @@ public class TeamService {
                 .isRead(false)
                 .createdAt(Instant.now())
                 .invitation(null)
+                .invitationId(null)
                 .team(teamMember.getTeam())
+                .teamId(teamMember.getTeam().getId())
                 .build());
 
         eventPublisher.publishEvent(new NotificationRequestedEvent(

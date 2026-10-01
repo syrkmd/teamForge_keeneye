@@ -37,6 +37,7 @@ public class RefreshTokenService {
                 .expiresAt(jwtService.getExpiration(refreshToken))
                 .revoked(false)
                 .user(user)
+                .userId(user.getId())
                 .build();
 
         repository.save(token);

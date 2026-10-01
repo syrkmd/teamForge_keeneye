@@ -75,8 +75,11 @@ public class InvitationService {
                 .status(InvitationStatus.PENDING)
                 .createdAt(Instant.now())
                 .project(projectRole.getProject())
+                .projectId(projectRole.getProject().getId())
                 .projectRole(projectRole)
+                .projectRoleId(projectRole.getId())
                 .user(user)
+                .userId(user.getId())
                 .build());
 
         createAndPublishNotification(
@@ -220,12 +223,15 @@ public class InvitationService {
         Notification notification = notificationRepository.save(Notification.builder()
                 .type(type)
                 .user(user)
+                .userId(user.getId())
                 .title(title)
                 .message(message)
                 .isRead(false)
                 .createdAt(Instant.now())
                 .invitation(invitation)
+                .invitationId(invitation != null ? invitation.getId() : null)
                 .team(team)
+                .teamId(team != null ? team.getId() : null)
                 .build());
 
         applicationEventPublisher.publishEvent(new NotificationRequestedEvent(

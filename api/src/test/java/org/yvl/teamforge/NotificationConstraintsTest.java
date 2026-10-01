@@ -72,6 +72,7 @@ public class NotificationConstraintsTest {
                 .completedProjectsCount(0)
                 .completionRate(0.0)
                 .systemRole(systemRole)
+                .systemRoleId(systemRole.getId())
                 .build();
 
         userRepository.save(user);
@@ -93,7 +94,9 @@ public class NotificationConstraintsTest {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .template(template)
+                .templateId(template.getId())
                 .owner(user)
+                .ownerId(user.getId())
                 .build();
 
         projectRepository.save(project);
@@ -104,6 +107,7 @@ public class NotificationConstraintsTest {
                 .requiredCount(1)
                 .status(ProjectRoleStatus.OPEN)
                 .project(project)
+                .projectId(project.getId())
                 .build();
 
         projectRoleRepository.save(role);
@@ -112,8 +116,11 @@ public class NotificationConstraintsTest {
                 .status(InvitationStatus.PENDING)
                 .createdAt(Instant.now())
                 .project(project)
+                .projectId(project.getId())
                 .projectRole(role)
+                .projectRoleId(role.getId())
                 .user(user)
+                .userId(user.getId())
                 .build();
 
         invitationRepository.saveAndFlush(invitation);
@@ -125,7 +132,9 @@ public class NotificationConstraintsTest {
                 .isRead(false)
                 .createdAt(Instant.now())
                 .user(user)
+                .userId(user.getId())
                 .invitation(invitation)
+                .invitationId(invitation.getId())
                 .build();
 
         notificationRepository.saveAndFlush(notification);

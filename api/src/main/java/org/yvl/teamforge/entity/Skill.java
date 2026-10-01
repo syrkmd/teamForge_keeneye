@@ -36,10 +36,16 @@ public class Skill {
     private TypeSkill type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false, insertable = false, updatable = false)
     private SkillCategory category;
 
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_user_id")
+    @JoinColumn(name = "created_by_user_id", insertable = false, updatable = false)
     private User createdByUser;
+
+    @Column(name = "created_by_user_id")
+    private Long createdByUserId;
 }

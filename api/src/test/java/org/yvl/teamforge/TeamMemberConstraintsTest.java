@@ -69,6 +69,7 @@ public class TeamMemberConstraintsTest {
                 .completedProjectsCount(0)
                 .completionRate(0.0)
                 .systemRole(systemRole)
+                .systemRoleId(systemRole.getId())
                 .build();
 
 
@@ -91,7 +92,9 @@ public class TeamMemberConstraintsTest {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .template(template)
+                .templateId(template.getId())
                 .owner(user)
+                .ownerId(user.getId())
                 .build();
 
         projectRepository.save(project);
@@ -110,6 +113,7 @@ public class TeamMemberConstraintsTest {
                 .requiredCount(1)
                 .status(ProjectRoleStatus.OPEN)
                 .project(project)
+                .projectId(project.getId())
                 .build();
 
         projectRoleRepository.save(role);
@@ -118,8 +122,11 @@ public class TeamMemberConstraintsTest {
                 .status(TeamMemberStatus.ACTIVE)
                 .joinedAt(Instant.now())
                 .team(team)
+                .teamId(team.getId())
                 .user(user)
+                .userId(user.getId())
                 .projectRole(role)
+                .projectRoleId(role.getId())
                 .build();
 
         teamMemberRepository.saveAndFlush(member);
@@ -128,8 +135,11 @@ public class TeamMemberConstraintsTest {
                 .status(TeamMemberStatus.ACTIVE)
                 .joinedAt(Instant.now())
                 .team(team)
+                .teamId(team.getId())
                 .user(user)
+                .userId(user.getId())
                 .projectRole(role)
+                .projectRoleId(role.getId())
                 .build();
 
         assertThrows(

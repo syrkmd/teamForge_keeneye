@@ -36,10 +36,16 @@ public class UserSkill {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "skill_id", nullable = false)
+    @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
     private Skill skill;
+
+    @Column(name = "skill_id", nullable = false)
+    private Long skillId;
 }

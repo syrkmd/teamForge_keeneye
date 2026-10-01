@@ -50,6 +50,7 @@ public class ProjectRoleService {
                         .requiredCount(request.getRequiredCount())
                         .description(request.getDescription())
                         .project(project)
+                        .projectId(project.getId())
                         .build());
 
 

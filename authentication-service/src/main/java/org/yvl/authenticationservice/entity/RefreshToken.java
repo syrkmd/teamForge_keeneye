@@ -34,6 +34,9 @@ public class RefreshToken {
     private boolean revoked;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

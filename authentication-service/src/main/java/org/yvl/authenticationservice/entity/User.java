@@ -60,6 +60,9 @@ public class User {
     private Double completionRate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "system_role_id", nullable = false)
+    @JoinColumn(name = "system_role_id", nullable = false, insertable = false, updatable = false)
     private SystemRole systemRole;
+
+    @Column(name = "system_role_id", nullable = false)
+    private Long systemRoleId;
 }

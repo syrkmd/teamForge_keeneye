@@ -31,10 +31,16 @@ public class ProjectRoleSkill {
     private Integer minLevel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_role_id", nullable = false)
+    @JoinColumn(name = "project_role_id", nullable = false, insertable = false, updatable = false)
     private ProjectRole projectRole;
 
+    @Column(name = "project_role_id", nullable = false)
+    private Long projectRoleId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "skill_id", nullable = false)
+    @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
     private Skill skill;
+
+    @Column(name = "skill_id", nullable = false)
+    private Long skillId;
 }

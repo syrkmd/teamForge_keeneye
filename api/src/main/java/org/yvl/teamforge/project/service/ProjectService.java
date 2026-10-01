@@ -69,7 +69,9 @@ public class ProjectService {
                 .createdAt(now)
                 .updatedAt(now)
                 .template(template)
+                .templateId(template.getId())
                 .owner(owner)
+                .ownerId(owner.getId())
                 .build());
 
         List<TemplateRole> templateRoles = template.getTemplateRoles();
@@ -78,6 +80,7 @@ public class ProjectService {
                 .stream()
                 .map(templateRole -> ProjectRole.builder()
                             .project(project)
+                            .projectId(project.getId())
                             .description(templateRole.getDescription())
                             .roleName(templateRole.getRoleName())
                             .requiredCount(templateRole.getRequiredCount())
@@ -101,14 +104,18 @@ public class ProjectService {
 
         List<ProjectRoleSkill> projectRoleSkills = templateRoleSkills
                 .stream()
-                .map(templateRoleSkill -> ProjectRoleSkill.builder()
-                        .minLevel(templateRoleSkill.getMinLevel())
-                        .projectRole(
-                                roleMap.get(templateRoleSkill.getTemplateRole().getId())
-                        )
-                        .skill(templateRoleSkill.getSkill())
-                        .build()
-                ).toList();
+                .map(templateRoleSkill -> {
+                    ProjectRole projectRole = roleMap.get(templateRoleSkill.getTemplateRole().getId());
+                    Skill skill = templateRoleSkill.getSkill();
+
+                    return ProjectRoleSkill.builder()
+                            .minLevel(templateRoleSkill.getMinLevel())
+                            .projectRole(projectRole)
+                            .projectRoleId(projectRole.getId())
+                            .skill(skill)
+                            .skillId(skill.getId())
+                            .build();
+                }).toList();
 
         projectRoleSkillRepository.saveAll(projectRoleSkills);
 
@@ -140,7 +147,7 @@ public class ProjectService {
         Project project = repository.findById(id).orElseThrow(() ->
                 new ProjectNotFoundException(id));
 
-        if (!project.getOwner().getId().equals(userPrincipal.getUser().getId())) {
+        if (!project.getOwnerId().equals(userPrincipal.getUser().getId())) {
             throw new ProjectAccessDeniedException();
         }
 

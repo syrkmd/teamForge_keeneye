@@ -39,7 +39,7 @@ public class ProjectAccessService {
         ProjectRole projectRole = projectRoleRepository.findById(projectRoleId).orElseThrow(() ->
                 new ProjectRoleNotFoundException(projectRoleId));
 
-        if (!projectRole.getProject().getId().equals(project.getId())) {
+        if (!projectRole.getProjectId().equals(project.getId())) {
             throw new ProjectRoleNotBelongToProjectException(projectRoleId, projectId);
         }
 
@@ -57,7 +57,7 @@ public class ProjectAccessService {
         ProjectRole projectRole = projectRoleRepository.findById(projectRoleId).orElseThrow(() ->
                 new ProjectRoleNotFoundException(projectRoleId));
 
-        if (!projectRole.getProject().getId().equals(project.getId())) {
+        if (!projectRole.getProjectId().equals(project.getId())) {
             throw new ProjectRoleNotBelongToProjectException(projectRoleId, projectId);
         }
 
@@ -98,7 +98,7 @@ public class ProjectAccessService {
         ProjectRole projectRole = projectRoleRepository.findById(projectRoleId).orElseThrow(() ->
                 new ProjectRoleNotFoundException(projectRoleId));
 
-        if (!projectRole.getProject().getId().equals(project.getId())) {
+        if (!projectRole.getProjectId().equals(project.getId())) {
             throw new ProjectRoleNotBelongToProjectException(projectRoleId, projectId);
         }
 

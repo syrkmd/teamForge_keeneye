@@ -41,6 +41,9 @@ public class Recommendation {
     private Instant resolvedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
+    @JoinColumn(name = "team_id", nullable = false, insertable = false, updatable = false)
     private Team team;
+
+    @Column(name = "team_id", nullable = false)
+    private Long teamId;
 }
