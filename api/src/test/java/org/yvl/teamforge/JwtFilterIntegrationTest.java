@@ -12,25 +12,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import org.yvl.teamforge.config.JwtProperties;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.yvl.teamforge.security.jwt.dto.response.LoadedKey;
+import org.yvl.teamforge.security.jwt.key.AuthJwtKeyProvider;
 import org.yvl.teamforge.entity.SystemRole;
 import org.yvl.teamforge.entity.User;
 import org.yvl.teamforge.entity.enums.SystemRoleName;
 import org.yvl.teamforge.security.user.UserPrincipal;
 
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
+import java.security.KeyPair;
 import java.util.Date;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @Testcontainers
 @SpringBootTest
+@Import(JwtFilterIntegrationTest.JwtTestConfiguration.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class JwtFilterIntegrationTest {
@@ -38,8 +42,19 @@ public class JwtFilterIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private JwtProperties jwtProperties;
+    private static final String TEST_KID = "api-integration-test";
+    private static final KeyPair TEST_KEY_PAIR = Jwts.SIG.ES256.keyPair().build();
+
+    @TestConfiguration(proxyBeanMethods = false)
+    static class JwtTestConfiguration {
+        @Bean
+        @Primary
+        AuthJwtKeyProvider testJwtKeyProvider() {
+            var provider = mock(AuthJwtKeyProvider.class);
+            when(provider.load()).thenReturn(new LoadedKey(TEST_KEY_PAIR.getPublic(), TEST_KID));
+            return provider;
+        }
+    }
 
     @Container
     @ServiceConnection
@@ -125,21 +140,9 @@ public class JwtFilterIntegrationTest {
                 .claim("role", userPrincipal.getUser().getSystemRole().getName().name())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .header().keyId(jwtProperties.getKid()).and()
-                .signWith(loadTestPrivateKey(), Jwts.SIG.ES256)
+                .header().keyId(TEST_KID).and()
+                .signWith(TEST_KEY_PAIR.getPrivate(), Jwts.SIG.ES256)
                 .compact();
     }
 
-    private PrivateKey loadTestPrivateKey() throws Exception {
-        String encodedPrivateKey = System.getenv("JWT_PRIVATE_KEY");
-        String pem = new String(Base64.getDecoder().decode(encodedPrivateKey), StandardCharsets.UTF_8);
-        String key = pem
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
-        byte[] keyBytes = Base64.getDecoder().decode(key);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        return keyFactory.generatePrivate(keySpec);
-    }
 }

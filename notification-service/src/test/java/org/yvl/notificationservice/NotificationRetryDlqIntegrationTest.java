@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.junit.jupiter.Container;
@@ -14,6 +15,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.yvl.notificationservice.consumer.event.NotificationEventPayload;
 import org.yvl.notificationservice.repository.NotificationRepository;
+import org.yvl.notificationservice.security.jwt.TestJwtConfiguration;
 
 import java.time.Duration;
 
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 
 @Tag("integration")
 @Testcontainers
+@Import(TestJwtConfiguration.class)
 @SpringBootTest(properties = {
         "spring.sql.init.mode=always",
         "spring.sql.init.schema-locations=classpath:db/notifications-schema.sql"

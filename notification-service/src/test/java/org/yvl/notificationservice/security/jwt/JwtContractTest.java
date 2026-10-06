@@ -16,8 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.yvl.notificationservice.config.JwtProperties;
+import org.yvl.notificationservice.security.jwt.dto.response.LoadedKey;
+import org.yvl.notificationservice.security.jwt.key.AuthJwtKeyProvider;
 import org.yvl.notificationservice.security.handler.JwtAuthenticationEntryPoint;
 import org.yvl.notificationservice.security.jwt.filter.JwtFilter;
 import org.yvl.notificationservice.security.jwt.service.JwtService;
@@ -82,7 +82,7 @@ class JwtContractTest {
     void validAccessTokenAuthenticatesUser() throws ServletException, IOException {
         String token = buildAccessToken(keyPair.getPrivate(), KID, ACCESS_EXPIRATION);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertAuthenticatedAsUser();
@@ -94,7 +94,7 @@ class JwtContractTest {
     void tokenWithInvalidSignatureIsRejected() throws ServletException, IOException {
         String token = buildAccessToken(generateKeyPair().getPrivate(), KID, ACCESS_EXPIRATION);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(SignatureException.class);
@@ -114,7 +114,7 @@ class JwtContractTest {
                 + Base64.getUrlEncoder().withoutPadding().encodeToString(tamperedPayload.getBytes(StandardCharsets.UTF_8))
                 + "." + parts[2];
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(tamperedToken), response, filterChain);
 
         assertRejected(SignatureException.class);
@@ -124,7 +124,7 @@ class JwtContractTest {
     void expiredTokenIsRejected() throws ServletException, IOException {
         String token = buildAccessToken(keyPair.getPrivate(), KID, -1_000L);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected("JWT expired", ExpiredJwtException.class);
@@ -134,7 +134,7 @@ class JwtContractTest {
     void tokenWithUnexpectedKidIsRejected() throws ServletException, IOException {
         String token = buildAccessToken(keyPair.getPrivate(), "unknown-key", ACCESS_EXPIRATION);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(JwtException.class);
@@ -144,7 +144,7 @@ class JwtContractTest {
     void tokenWithoutKidIsRejected() throws ServletException, IOException {
         String token = buildAccessToken(keyPair.getPrivate(), null, ACCESS_EXPIRATION);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(JwtException.class);
@@ -160,7 +160,7 @@ class JwtContractTest {
                 .header().keyId(KID).and()
                 .compact();
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(JwtException.class);
@@ -177,7 +177,7 @@ class JwtContractTest {
                 .signWith(Keys.hmacShaKeyFor(keyPair.getPublic().getEncoded()), Jwts.SIG.HS256)
                 .compact();
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(JwtException.class);
@@ -187,7 +187,7 @@ class JwtContractTest {
     void refreshTokenIsNotAcceptedAsAccessToken() throws ServletException, IOException {
         String token = buildRefreshToken(keyPair.getPrivate(), KID);
 
-        createJwtFilter(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()), KID)
+        createJwtFilter(toBase64Pem(keyPair.getPublic().getEncoded()), KID)
                 .doFilter(requestWith(token), response, filterChain);
 
         assertRejected(JwtException.class);
@@ -240,14 +240,19 @@ class JwtContractTest {
     }
 
     private JwtFilter createJwtFilter(String encodedPublicKey, String kid) {
-        JwtProperties properties = new JwtProperties();
-        properties.setPublicKey(encodedPublicKey);
-        properties.setKid(kid);
-
-        JwtService jwtService = new JwtService(properties);
-        ReflectionTestUtils.invokeMethod(jwtService, "initKey");
-
-        return new JwtFilter(jwtService, properties, authenticationEntryPoint);
+        try {
+            String pem = new String(Base64.getDecoder().decode(encodedPublicKey), StandardCharsets.UTF_8);
+            byte[] der = Base64.getDecoder().decode(pem.replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "").replaceAll("\\s", ""));
+            var publicKey = java.security.KeyFactory.getInstance("EC").generatePublic(
+                    new java.security.spec.X509EncodedKeySpec(der));
+            var provider = mock(AuthJwtKeyProvider.class);
+            when(provider.load()).thenReturn(new LoadedKey(publicKey, kid));
+            JwtService jwtService = new JwtService(provider);
+            return new JwtFilter(jwtService, authenticationEntryPoint);
+        } catch (java.security.GeneralSecurityException e) {
+            throw new IllegalStateException("Invalid test key", e);
+        }
     }
 
     private String buildAccessToken(PrivateKey privateKey, String kid, long expirationMillis) {
@@ -288,9 +293,9 @@ class JwtContractTest {
         }
     }
 
-    private static String toBase64Pem(String type, byte[] der) {
+    private static String toBase64Pem(byte[] der) {
         String body = Base64.getMimeEncoder(64, "\n".getBytes(StandardCharsets.UTF_8)).encodeToString(der);
-        String pem = "-----BEGIN " + type + "-----\n" + body + "\n-----END " + type + "-----\n";
+        String pem = "-----BEGIN " + "PUBLIC KEY" + "-----\n" + body + "\n-----END " + "PUBLIC KEY" + "-----\n";
 
         return Base64.getEncoder().encodeToString(pem.getBytes(StandardCharsets.UTF_8));
     }

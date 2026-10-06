@@ -4,14 +4,17 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
+import org.yvl.notificationservice.security.jwt.TestJwtConfiguration;
 
 @Tag("integration")
 @Testcontainers
+@Import(TestJwtConfiguration.class)
 @SpringBootTest(properties = {
         "spring.sql.init.mode=always",
         "spring.sql.init.schema-locations=classpath:db/notifications-schema.sql"

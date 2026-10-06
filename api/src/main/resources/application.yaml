@@ -19,8 +19,10 @@ spring:
     enabled: true
 
 jwt:
-  public-key: ${JWT_PUBLIC_KEY}
-  kid: ${JWT_KID}
+  auth-url: ${JWT_AUTH_URL}
+  keys-endpoint: ${JWT_KEYS_ENDPOINT}
+  connect-timeout: ${JWT_AUTH_CONNECT_TIMEOUT:2s}
+  read-timeout: ${JWT_AUTH_READ_TIMEOUT:3s}
 
 analytics:
   refresh-delay: 300000

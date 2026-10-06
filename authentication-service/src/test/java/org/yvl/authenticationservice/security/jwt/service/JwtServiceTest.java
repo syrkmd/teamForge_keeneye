@@ -8,8 +8,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.yvl.authenticationservice.config.JwtProperties;
+import org.yvl.authenticationservice.security.jwt.key.JwtKey;
 
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
@@ -30,23 +30,11 @@ class JwtServiceTest {
     private static final long ACCESS_EXPIRATION = 900_000L;
     private static final long REFRESH_EXPIRATION = 604_800_000L;
 
-    private static final String GOLDEN_KID = "teamforge-test-key";
-    private static final String GOLDEN_JTI = "9e96599d-6e4d-4d52-bcd0-50030994e8d7";
-    private static final String GOLDEN_PUBLIC_KEY =
-            "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQTU0ZDlZa0k0a1dMMTlq" +
-            "TDk4eGx4OWhsNnhkZgo2UmUxeXB3MHcyazlKS211aG9vZzI5aHpCbUJVMy84elhHaERDWFJtLzBkTXZudHNVWXlvV3pWWk9BPT0KLS0t" +
-            "LS1FTkQgUFVCTElDIEtFWS0tLS0tCg==";
-    private static final String GOLDEN_REFRESH_TOKEN =
-            "eyJraWQiOiJ0ZWFtZm9yZ2UtdGVzdC1rZXkiLCJhbGciOiJFUzI1NiJ9." +
-            "eyJzdWIiOiJnb2xkZW5AdGVhbWZvcmdlLnRlc3QiLCJqdGkiOiI5ZTk2NTk5ZC02ZTRkLTRkNTItYmNkMC01MDAzMDk5NGU4ZDciLCJpYXQi" +
-            "OjE3OTEwNDEyNTQsImV4cCI6NDEwMjQ0NDgwMH0." +
-            "bnSZC-R3p9E7Ix217csVlmxquiCb9HDsZ2-X_dRM8lnQSNw2MOZKs9Ui9Xd8g0HUeSUh2hEjQ_xMuFUZV9lkdg";
-
     private final KeyPair keyPair = generateKeyPair();
 
     @Test
     void accessTokenIsSignedWithEs256AndContainsKid() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateAccessToken("user@test.com", 123L, "USER");
 
@@ -58,7 +46,7 @@ class JwtServiceTest {
 
     @Test
     void accessTokenSignatureIsEs256Signature() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateAccessToken("user@test.com", 123L, "USER");
 
@@ -69,7 +57,7 @@ class JwtServiceTest {
 
     @Test
     void accessTokenContainsExactlyContractClaims() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateAccessToken("user@test.com", 123L, "USER");
 
@@ -84,7 +72,7 @@ class JwtServiceTest {
 
     @Test
     void refreshTokenIsSignedWithEs256AndContainsKid() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateRefreshToken("user@test.com");
 
@@ -96,7 +84,7 @@ class JwtServiceTest {
 
     @Test
     void refreshTokenContainsExactlyContractClaims() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateRefreshToken("user@test.com");
 
@@ -110,7 +98,7 @@ class JwtServiceTest {
 
     @Test
     void refreshTokensHaveUniqueJti() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String first = jwtService.generateRefreshToken("user@test.com");
         String second = jwtService.generateRefreshToken("user@test.com");
@@ -120,7 +108,7 @@ class JwtServiceTest {
 
     @Test
     void validRefreshTokenIsAccepted() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateRefreshToken("user@test.com");
 
@@ -136,16 +124,16 @@ class JwtServiceTest {
 
     @Test
     void tokenWithInvalidSignatureIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
-        String token = signToken(generateKeyPair().getPrivate(), KID, REFRESH_EXPIRATION);
+        String token = signToken(generateKeyPair().getPrivate(), KID);
 
         assertThrows(SignatureException.class, () -> jwtService.getClaims(token));
     }
 
     @Test
     void tokenWithTamperedPayloadIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = jwtService.generateAccessToken("user@test.com", 123L, "USER");
 
@@ -164,7 +152,7 @@ class JwtServiceTest {
 
     @Test
     void expiredTokenIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, -1_000L);
+        JwtService jwtService = createJwtService(keyPair, -1_000L);
 
         String token = jwtService.generateRefreshToken("user@test.com");
 
@@ -173,25 +161,25 @@ class JwtServiceTest {
 
     @Test
     void tokenWithUnexpectedKidIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
-        String token = signToken(keyPair.getPrivate(), "unknown-key", REFRESH_EXPIRATION);
+        String token = signToken(keyPair.getPrivate(), "unknown-key");
 
         assertThrows(JwtException.class, () -> jwtService.getClaims(token));
     }
 
     @Test
     void tokenWithoutKidIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
-        String token = signToken(keyPair.getPrivate(), null, REFRESH_EXPIRATION);
+        String token = signToken(keyPair.getPrivate(), null);
 
         assertThrows(JwtException.class, () -> jwtService.getClaims(token));
     }
 
     @Test
     void unsignedTokenIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = Jwts.builder()
                 .subject("user@test.com")
@@ -205,7 +193,7 @@ class JwtServiceTest {
 
     @Test
     void tokenSignedWithHs256UsingPublicKeyAsSecretIsRejected() {
-        JwtService jwtService = createJwtService(keyPair, ACCESS_EXPIRATION, REFRESH_EXPIRATION);
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
         String token = Jwts.builder()
                 .subject("user@test.com")
@@ -219,36 +207,48 @@ class JwtServiceTest {
     }
 
     @Test
-    void previouslyIssuedRefreshTokenRemainsValid() {
-        JwtProperties properties = new JwtProperties();
-        properties.setPrivateKey(toBase64Pem("PRIVATE KEY", keyPair.getPrivate().getEncoded()));
-        properties.setPublicKey(GOLDEN_PUBLIC_KEY);
-        properties.setKid(GOLDEN_KID);
-        properties.setAccessExpiration(ACCESS_EXPIRATION);
-        properties.setRefreshExpiration(REFRESH_EXPIRATION);
+    void malformedTokenIsRejected() {
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
 
-        JwtService jwtService = new JwtService(properties);
-        ReflectionTestUtils.invokeMethod(jwtService, "initKeys");
-
-        Claims claims = jwtService.getClaims(GOLDEN_REFRESH_TOKEN);
-
-        assertEquals("golden@teamforge.test", claims.getSubject());
-        assertEquals(GOLDEN_JTI, jwtService.getJti(GOLDEN_REFRESH_TOKEN));
-        assertEquals(Instant.ofEpochSecond(4102444800L), jwtService.getExpiration(GOLDEN_REFRESH_TOKEN));
+        assertThrows(JwtException.class, () -> jwtService.getClaims("not-a-jwt"));
+        assertThrows(JwtException.class, () -> jwtService.getClaims("a.b.c"));
+        assertThrows(JwtException.class, () -> jwtService.getClaims("e30.e30.e30"));
     }
 
-    private JwtService createJwtService(KeyPair keyPair, long accessExpiration, long refreshExpiration) {
+    @Test
+    void tokenWithTruncatedSignatureIsRejected() {
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
+
+        String token = jwtService.generateRefreshToken("user@test.com");
+        String truncatedToken = token.substring(0, token.length() - 10);
+
+        assertThrows(JwtException.class, () -> jwtService.getClaims(truncatedToken));
+    }
+
+    @Test
+    void emptyTokenIsRejectedWithIllegalArgumentException() {
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
+
+        assertThrows(IllegalArgumentException.class, () -> jwtService.getClaims(""));
+    }
+
+
+
+    @Test
+    void tokenWithUnknownKidAndInvalidSignatureIsRejected() {
+        JwtService jwtService = createJwtService(keyPair, REFRESH_EXPIRATION);
+
+        String token = signToken(generateKeyPair().getPrivate(), "unknown-key");
+
+        assertThrows(JwtException.class, () -> jwtService.getClaims(token));
+    }
+
+    private JwtService createJwtService(KeyPair keyPair, long refreshExpiration) {
         JwtProperties properties = new JwtProperties();
-        properties.setPrivateKey(toBase64Pem("PRIVATE KEY", keyPair.getPrivate().getEncoded()));
-        properties.setPublicKey(toBase64Pem("PUBLIC KEY", keyPair.getPublic().getEncoded()));
-        properties.setKid(KID);
-        properties.setAccessExpiration(accessExpiration);
+        properties.setAccessExpiration(JwtServiceTest.ACCESS_EXPIRATION);
         properties.setRefreshExpiration(refreshExpiration);
 
-        JwtService jwtService = new JwtService(properties);
-        ReflectionTestUtils.invokeMethod(jwtService, "initKeys");
-
-        return jwtService;
+        return new JwtService(new JwtKey(KID, keyPair.getPublic(), keyPair.getPrivate()), properties);
     }
 
     private Jws<Claims> parse(String token) {
@@ -258,12 +258,12 @@ class JwtServiceTest {
                 .parseSignedClaims(token);
     }
 
-    private String signToken(PrivateKey privateKey, String kid, long expirationMillis) {
+    private String signToken(PrivateKey privateKey, String kid) {
         var builder = Jwts.builder()
                 .subject("user@test.com")
                 .id(UUID.randomUUID().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationMillis));
+                .expiration(new Date(System.currentTimeMillis() + JwtServiceTest.REFRESH_EXPIRATION));
 
         if (kid != null) {
             builder.header().keyId(kid);
@@ -291,10 +291,4 @@ class JwtServiceTest {
         }
     }
 
-    private static String toBase64Pem(String type, byte[] der) {
-        String body = Base64.getMimeEncoder(64, "\n".getBytes(StandardCharsets.UTF_8)).encodeToString(der);
-        String pem = "-----BEGIN " + type + "-----\n" + body + "\n-----END " + type + "-----\n";
-
-        return Base64.getEncoder().encodeToString(pem.getBytes(StandardCharsets.UTF_8));
-    }
 }

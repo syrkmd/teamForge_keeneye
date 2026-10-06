@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.yvl.notificationservice.entity.enums.NotificationType;
+import org.yvl.notificationservice.security.jwt.TestJwtConfiguration;
 import org.yvl.notificationservice.sse.SseConnectionManager;
 import org.yvl.notificationservice.sse.dto.NotificationView;
 import tools.jackson.databind.ObjectMapper;
@@ -30,6 +32,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 @Tag("integration")
 @Testcontainers
+@Import(TestJwtConfiguration.class)
 @SpringBootTest(properties = {
         "spring.sql.init.mode=always",
         "spring.sql.init.schema-locations=classpath:db/notifications-schema.sql"

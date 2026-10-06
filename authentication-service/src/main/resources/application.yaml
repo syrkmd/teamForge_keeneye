@@ -13,8 +13,23 @@ spring:
     open-in-view: false
 
 jwt:
-  private-key: ${JWT_PRIVATE_KEY}
-  public-key: ${JWT_PUBLIC_KEY}
-  kid: ${JWT_KID}
   access-expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+  vault:
+    uri: ${VAULT_URI}
+    role-id: ${VAULT_ROLE_ID}
+    secret-id: ${VAULT_SECRET_ID}
+    mount: ${VAULT_KV_MOUNT}
+    secret-path: ${VAULT_JWT_PATH}
+    auth-mount: ${VAULT_APPROLE_MOUNT}
+    connect-timeout: ${VAULT_CONNECT_TIMEOUT:2s}
+    read-timeout: ${VAULT_READ_TIMEOUT:3s}
+    allow-local-http: ${VAULT_ALLOW_LOCAL_HTTP}
+
+logging:
+  level:
+    org.springframework.vault: "OFF"
+    org.springframework.web.client.RestTemplate: "OFF"
+    org.springframework.web.client.DefaultRestClient: "OFF"
+    org.springframework.http.converter: "OFF"

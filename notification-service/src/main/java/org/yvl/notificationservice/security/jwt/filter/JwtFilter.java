@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.yvl.notificationservice.config.JwtProperties;
 import org.yvl.notificationservice.security.handler.JwtAuthenticationEntryPoint;
 import org.yvl.notificationservice.security.jwt.service.JwtService;
 
@@ -26,7 +25,6 @@ import java.util.Collections;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final JwtProperties jwtProperties;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
@@ -51,12 +49,6 @@ public class JwtFilter extends OncePerRequestFilter {
             Jws<Claims> jws = jwtService.parseToken(token);
 
             Claims claims = jws.getPayload();
-            String kid = jws.getHeader().getKeyId();
-
-            if (!jwtProperties.getKid().equals(kid)) {
-                throw new JwtException("Invalid JWT key id");
-            }
-
             Long userId = claims.get("userId", Long.class);
 
             if (userId == null) {

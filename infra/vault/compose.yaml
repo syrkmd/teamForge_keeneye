@@ -1,0 +1,24 @@
+name: teamforge-vault-local
+services:
+  vault:
+    image: hashicorp/vault:2.1.1
+    restart: "no"
+    command: ["vault", "server", "-config=/vault/config/vault.hcl"]
+    environment:
+      VAULT_ADDR: http://127.0.0.1:8200
+    ports:
+      - "127.0.0.1:8200:8200"
+    volumes:
+      - ./config:/vault/config:ro
+      - ./data:/vault/file
+    networks: [vault]
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    stop_grace_period: 30s
+networks:
+  vault:
+    driver: bridge

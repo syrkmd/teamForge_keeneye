@@ -44,3 +44,15 @@ out/
 .DS_Store
 
 *.http
+
+# Vault local secrets
+infra/vault/data/
+infra/vault/secrets/
+infra/vault/.vault-token
+infra/vault/root-token
+infra/vault/secret-id
+infra/vault/wrapped-secret-id
+infra/vault/backups/
+infra/vault/restore-test/
+infra/vault/__pycache__/
+infra/vault/vault_local.py

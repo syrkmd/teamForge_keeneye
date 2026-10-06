@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.*;
 @Tag("integration")
 @Testcontainers
 @SpringBootTest
+@Import(JwtFilterIntegrationTest.JwtTestConfiguration.class)
 @ActiveProfiles("test")
 public class NotificationEventListenerIntegrationTest {
 

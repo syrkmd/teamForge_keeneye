@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("integration")
 @Testcontainers
 @SpringBootTest
+@Import(JwtFilterIntegrationTest.JwtTestConfiguration.class)
 @ActiveProfiles("test")
 public class IntegrationTestContainer {
 
