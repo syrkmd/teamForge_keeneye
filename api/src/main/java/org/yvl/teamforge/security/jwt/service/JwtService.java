@@ -8,7 +8,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.yvl.teamforge.security.jwt.key.AuthJwtKeyProvider;
+import org.yvl.jwtkeycommon.key.AuthJwtKeyProvider;
 
 import java.security.PublicKey;
 

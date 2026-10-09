@@ -1,16 +1,8 @@
 package org.yvl.notificationservice.security.jwt.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
-import org.yvl.notificationservice.security.jwt.key.AuthJwtKeyProvider;
-
-import java.security.PublicKey;
+import org.yvl.jwtkeycommon.key.AuthJwtKeyProvider;
 
 @Service
 public class JwtService {

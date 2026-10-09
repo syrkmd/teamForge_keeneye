@@ -1,4 +1,4 @@
-package org.yvl.notificationservice.security.jwt.dto.response;
+package org.yvl.jwtkeycommon.dto.response;
 
 import java.security.PublicKey;
 

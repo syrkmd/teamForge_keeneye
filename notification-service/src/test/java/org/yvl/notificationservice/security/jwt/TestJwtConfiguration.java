@@ -3,8 +3,8 @@ package org.yvl.notificationservice.security.jwt;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.yvl.notificationservice.security.jwt.dto.response.LoadedKey;
-import org.yvl.notificationservice.security.jwt.key.AuthJwtKeyProvider;
+import org.yvl.jwtkeycommon.dto.response.LoadedKey;
+import org.yvl.jwtkeycommon.key.AuthJwtKeyProvider;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;

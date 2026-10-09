@@ -27,6 +27,7 @@ notification:
 
 jwt:
   auth-url: ${JWT_AUTH_URL}
+  keys-endpoint: ${JWT_KEYS_ENDPOINT}
   connect-timeout: ${JWT_AUTH_CONNECT_TIMEOUT:2s}
   read-timeout: ${JWT_AUTH_READ_TIMEOUT:3s}
 

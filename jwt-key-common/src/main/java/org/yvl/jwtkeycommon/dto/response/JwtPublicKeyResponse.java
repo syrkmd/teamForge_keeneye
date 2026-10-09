@@ -1,4 +1,4 @@
-package org.yvl.teamforge.security.jwt.dto.response;
+package org.yvl.jwtkeycommon.dto.response;
 
 import lombok.Data;
 

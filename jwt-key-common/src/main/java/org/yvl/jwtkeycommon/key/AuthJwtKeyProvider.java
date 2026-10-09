@@ -1,13 +1,13 @@
-package org.yvl.teamforge.security.jwt.key;
+package org.yvl.jwtkeycommon.key;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.yvl.teamforge.config.JwtProperties;
-import org.yvl.teamforge.security.jwt.dto.response.JwtPublicKeyResponse;
-import org.yvl.teamforge.security.jwt.dto.response.LoadedKey;
-import org.yvl.teamforge.security.jwt.exception.JwtKeyInitializationException;
+import org.yvl.jwtkeycommon.config.JwtProperties;
+import org.yvl.jwtkeycommon.dto.response.JwtPublicKeyResponse;
+import org.yvl.jwtkeycommon.dto.response.LoadedKey;
+import org.yvl.jwtkeycommon.exception.JwtKeyInitializationException;
 
 import java.net.http.HttpClient;
 import java.security.AlgorithmParameters;

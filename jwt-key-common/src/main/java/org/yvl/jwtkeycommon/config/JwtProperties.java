@@ -1,4 +1,4 @@
-package org.yvl.teamforge.config;
+package org.yvl.jwtkeycommon.config;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
